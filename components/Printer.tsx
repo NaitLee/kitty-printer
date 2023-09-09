@@ -64,40 +64,36 @@ export default function Printer(props: PrinterProps) {
                 service.getCharacteristic(CAT_PRINT_TX_CHAR),
                 service.getCharacteristic(CAT_PRINT_RX_CHAR)
             ]);
-            const notify = {
-                paused: false
-            };
             const printer = new CatPrinter(
                 device.name,
                 tx.writeValueWithoutResponse.bind(tx),
-                notify,
                 false
             );
 
-            const update_pause = (event: Event) => {
-                //@ts-ignore:
-                const data: DataView = event.target.value;
-                const message = new Uint8Array(data.buffer);
-                if (arrayEqual(message, printer.pause)) {
-                    notify.paused = true;
-                } else if (arrayEqual(message, printer.resume)) {
-                    notify.paused = false;
-                }
-            };
+            // TODO: be aware of other printer state
             await rx.startNotifications()
-                .then(() => rx.addEventListener('characteristicvaluechanged', update_pause))
+                .then(() => rx.addEventListener('characteristicvaluechanged', printer.notifier))
                 .catch((error: Error) => console.log(error));
+
+            // TODO: configurable speed & energy
             await printer.prepare(32, 0x5000);
             for (const stuff of stuffs) {
                 const data = bitmap_data[stuff.id];
                 const bitmap = rgbaToBits(new Uint32Array(data.data.buffer));
                 const pitch = data.width / 8 | 0;
                 for (let i = 0; i < data.height * pitch; i += pitch) {
-                    await printer.draw(bitmap.slice(i, i + pitch));
+                    const line = bitmap.slice(i, i + pitch);
+                    if (line.every(byte => byte === 0)){
+                        console.log('feed')
+                        await printer.feed(1);
+                    }else{
+                        console.log('paint')
+                        await printer.draw(line);}
                 }
             }
+            // TODO: configurable feed
             await printer.finish(128);
-            await rx.stopNotifications().then(() => rx.removeEventListener('characteristicvaluechanged', update_pause));
+            await rx.stopNotifications().then(() => rx.removeEventListener('characteristicvaluechanged', printer.notifier));
         } finally {
             await delay(500);
             if (server) server.disconnect();

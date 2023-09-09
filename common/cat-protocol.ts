@@ -1,4 +1,3 @@
-import { DEF_CANVAS_WIDTH } from "./constants.ts";
 
 const crc8_table = [
     0x00, 0x07, 0x0e, 0x09, 0x1c, 0x1b, 0x12, 0x15, 0x38, 0x3f, 0x36, 0x31,
@@ -57,7 +56,7 @@ function delay(msecs: number) {
     return new Promise<void>(resolve => setTimeout(() => resolve(), msecs));
 }
 
-enum Command {
+export enum Command {
     ApplyEnergy = 0xbe,
     GetDeviceState = 0xa3,
     GetDeviceInfo = 0xa8,
@@ -71,36 +70,79 @@ enum Command {
     Bitmap = 0xa2,
 }
 
+export enum CommandType {
+    Transfer = 0,
+    Response = 1,
+}
+
+export interface PrinterState {
+    out_of_paper: number;
+    cover: number;
+    overheat: number;
+    low_power: number;
+    pause: number;
+    busy: number;
+}
+
+export enum StateFlag {
+    out_of_paper = 1 << 0,
+    cover = 1 << 1,
+    overheat = 1 << 2,
+    low_power = 1 << 3,
+    pause = 1 << 4,
+    busy = 0x80,
+}
+
 export class CatPrinter {
 
     pause = new Uint8Array([0x51, 0x78, 0xa3, 0x01, 0x01, 0x00, 0x10, 0x70, 0xff]);
     resume = new Uint8Array([0x51, 0x78, 0xa3, 0x01, 0x01, 0x00, 0x00, 0x00, 0xff]);
-    // paused = false;
     mtu = 200;
     buffer = new Uint8Array(this.mtu);
     bufferSize = 0;
+    state: PrinterState;
 
     constructor(
-        public model: string,
-        public write: (command: Uint8Array) => Promise<void>,
-        public notify: { paused: boolean },
-        public dry_run?: boolean) {}
+            public model: string,
+            public write: (command: Uint8Array) => Promise<void>,
+            public dry_run?: boolean) {
+        this.state = {
+            out_of_paper: 0,
+            cover: 0,
+            overheat: 0,
+            low_power: 0,
+            pause: 0,
+            busy: 0
+        };
+    }
 
-    newModel() {
+    notifier = (event: Event) => {
+        //@ts-ignore:
+        const data: DataView = event.target.value;
+        const message = new Uint8Array(data.buffer);
+        const state = message[6];
+        this.state = {
+            out_of_paper: state & StateFlag.out_of_paper,
+            cover: state & StateFlag.cover,
+            overheat: state & StateFlag.overheat,
+            low_power: state & StateFlag.low_power,
+            pause: state & StateFlag.pause,
+            busy: state & StateFlag.busy
+        };
+        console.log(this.state);
+    }
+
+    isNewModel() {
         return this.model === 'GB03' || this.model.startsWith('MX');
     }
 
     compressOk() {
-        return this.newModel();
+        return this.isNewModel();
     }
 
-    problemFeeding() {
-        return this.model.startsWith('MX');
-    }
-
-    make(command: Command, payload: Uint8Array) {
+    make(command: Command, payload: Uint8Array, type: CommandType = CommandType.Transfer) {
         return new Uint8Array([
-            0x51, 0x78, command, 0x00, payload.length, 0x00,
+            0x51, 0x78, command, type, payload.length % 0xff, payload.length / 0xff | 0,
             ...payload, crc8(payload), 0xff
         ]);
     }
@@ -111,7 +153,7 @@ export class CatPrinter {
     }
 
     async flush() {
-        while (this.notify.paused)
+        while (this.state.pause)
             await delay(100);
         if (this.bufferSize === 0)
             return;
@@ -137,13 +179,6 @@ export class CatPrinter {
         return this.draw(line.map(reverseBits));
     }
 
-    start() {
-        return this.send(new Uint8Array(
-            this.newModel()
-                ? [0x51, 0x78, 0xa3, 0x00, 0x01, 0x00, 0x00, 0x00, 0xff]
-                : [0x12, 0x51, 0x78, 0xa3, 0x00, 0x01, 0x00, 0x00, 0x00, 0xff]));
-    }
-
     applyEnergy() {
         return this.send(this.make(Command.ApplyEnergy, bytes(0x01)));
     }
@@ -160,7 +195,7 @@ export class CatPrinter {
         return this.send(this.make(Command.UpdateDevice, bytes(0x00)));
     }
 
-    setDpiAs200() {
+    setDpi(_dpi = 200) {
         return this.send(this.make(Command.SetDpi, bytes(50)));
     }
 
@@ -173,17 +208,11 @@ export class CatPrinter {
     }
 
     retract(points: number) {
-        return this.send(this.make(Command.Retract, bytes(points)));
+        return this.send(this.make(Command.Retract, bytes(points, 2)));
     }
 
     feed(points: number) {
-        if (this.problemFeeding())
-            return (async () => {
-                for (let i = 0; i < points; ++i)
-                    await this.draw(new Uint8Array(points * DEF_CANVAS_WIDTH / 8));
-            })();
-        else
-            return this.send(this.make(Command.Feed, bytes(points)));
+        return this.send(this.make(Command.Feed, bytes(points, 2)));
     }
 
     setSpeed(value: number) {
@@ -197,8 +226,7 @@ export class CatPrinter {
     async prepare(speed: number, energy: number) {
         await this.flush();
         await this.getDeviceState();
-        await this.start();
-        await this.setDpiAs200();
+        await this.setDpi();
         await this.setSpeed(speed);
         await this.setEnergy(energy);
         await this.applyEnergy();
