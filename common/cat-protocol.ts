@@ -116,10 +116,7 @@ export class CatPrinter {
         };
     }
 
-    notifier = (event: Event) => {
-        //@ts-ignore:
-        const data: DataView = event.target.value;
-        const message = new Uint8Array(data.buffer);
+    notify = (message: Uint8Array) => {
         const state = message[6];
         this.state = {
             out_of_paper: state & StateFlag.out_of_paper,
@@ -129,7 +126,6 @@ export class CatPrinter {
             pause: state & StateFlag.pause,
             busy: state & StateFlag.busy
         };
-        console.log(this.state);
     }
 
     isNewModel() {

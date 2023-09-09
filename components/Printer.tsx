@@ -69,10 +69,16 @@ export default function Printer(props: PrinterProps) {
                 tx.writeValueWithoutResponse.bind(tx),
                 false
             );
+            const notifier = () => {
+                //@ts-ignore:
+                const data: DataView = event.target.value;
+                const message = new Uint8Array(data.buffer);
+                printer.notify(message);
+            };
 
             // TODO: be aware of other printer state
             await rx.startNotifications()
-                .then(() => rx.addEventListener('characteristicvaluechanged', printer.notifier))
+                .then(() => rx.addEventListener('characteristicvaluechanged', notifier))
                 .catch((error: Error) => console.log(error));
 
             // TODO: configurable speed & energy
@@ -83,17 +89,15 @@ export default function Printer(props: PrinterProps) {
                 const pitch = data.width / 8 | 0;
                 for (let i = 0; i < data.height * pitch; i += pitch) {
                     const line = bitmap.slice(i, i + pitch);
-                    if (line.every(byte => byte === 0)){
-                        console.log('feed')
+                    if (line.every(byte => byte === 0))
                         await printer.feed(1);
-                    }else{
-                        console.log('paint')
-                        await printer.draw(line);}
+                    else
+                        await printer.draw(line);
                 }
             }
             // TODO: configurable feed
             await printer.finish(128);
-            await rx.stopNotifications().then(() => rx.removeEventListener('characteristicvaluechanged', printer.notifier));
+            await rx.stopNotifications().then(() => rx.removeEventListener('characteristicvaluechanged', notifier));
         } finally {
             await delay(500);
             if (server) server.disconnect();
