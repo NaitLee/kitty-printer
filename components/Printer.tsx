@@ -7,6 +7,7 @@ import { Icons } from "../common/icons.tsx";
 import { _ } from "../common/i18n.tsx";
 import { CatPrinter } from "../common/cat-protocol.ts";
 import { delay } from "https://deno.land/std@0.193.0/async/delay.ts";
+import {useLocalStorage} from "../common/hooks.ts";
 
 declare let navigator: Navigator & {
     // deno-lint-ignore no-explicit-any
@@ -39,6 +40,11 @@ export default function Printer(props: PrinterProps) {
         data[update.index] = update;
         return data;
     }, {});
+
+    let [finishFeed] = useLocalStorage<number>('finishFeed', 120);
+    let [speed] = useLocalStorage<number>('speed', 32);
+    let [energy] = useLocalStorage<number>('energy', 0x5000);
+
     const stuffs = props.stuffs;
     if (stuffs.length === 0)
         return <div class="kitty-preview">
@@ -81,8 +87,7 @@ export default function Printer(props: PrinterProps) {
                 .then(() => rx.addEventListener('characteristicvaluechanged', notifier))
                 .catch((error: Error) => console.log(error));
 
-            // TODO: configurable speed & energy
-            await printer.prepare(32, 0x5000);
+            await printer.prepare(speed, energy);
             for (const stuff of stuffs) {
                 const data = bitmap_data[stuff.id];
                 const bitmap = rgbaToBits(new Uint32Array(data.data.buffer));
@@ -95,8 +100,8 @@ export default function Printer(props: PrinterProps) {
                         await printer.draw(line);
                 }
             }
-            // TODO: configurable feed
-            await printer.finish(128);
+
+            await printer.finish(finishFeed);
             await rx.stopNotifications().then(() => rx.removeEventListener('characteristicvaluechanged', notifier));
         } finally {
             await delay(500);

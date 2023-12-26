@@ -57,7 +57,7 @@ input[type="text"] {
 }
 input[type="number"],
 input[inputmode="numeric"] {
-    width: 4em;
+    width: 6em;
 }
 
 button,
@@ -198,8 +198,23 @@ p {
     margin-bottom: 1em;
     transition: height 0.3s cubic-bezier(.08,.82,.17,1);
 }
+
+.settings {
+    text-align: center;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+    border-bottom: 1px solid var(--gray-1);
+    margin-bottom: 1em;
+    transition: height 0.3s cubic-bezier(.08,.82,.17,1);
+}
 .about--visible {
     height: 10em;
+    pointer-events: unset;
+}
+
+.settings--visible {
+    height: 15em;
     pointer-events: unset;
 }
 
