@@ -27,7 +27,7 @@ export default function ({visible}:{visible:boolean}){
                     data-selected={finishFeed === 100}>
                 <span className="stuff__label">{_('100')}</span>
             </button>
-            <input className="option__item" type="number" min={0} max={65535} value={finishFeed} onInput={(e:any)=>setFinishFeed(e.target.value)}/>
+            <input className="option__item" type="number" min={0} max={65535} value={finishFeed} onInput={(e:any)=>setFinishFeed(+e.target.value)}/>
         </div>
 
         <div className="stuff__option">
@@ -48,7 +48,7 @@ export default function ({visible}:{visible:boolean}){
                 <span className="stuff__label">{_('Good Quality')}</span>
             </button>
 
-            <input className="option__item" type="number" min={4} max={255} value={speed} onInput={(e:any)=>setSpeed(e.target.value)}/>
+            <input className="option__item" type="number" min={4} max={255} value={speed} onInput={(e:any)=>setSpeed(+e.target.value)}/>
         </div>
 
         <div className="stuff__option">
@@ -69,7 +69,7 @@ export default function ({visible}:{visible:boolean}){
                 <span className="stuff__label">{_('High')}</span>
             </button>
 
-            <input className="option__item" type="number" min={0} max={0xFFFF} value={energy} onInput={(e:any)=>setEnergy(e.target.value)}/>
+            <input className="option__item" type="number" min={0} max={0xFFFF} value={energy} onInput={(e:any)=>setEnergy(+e.target.value)}/>
         </div>
     </div>
 }

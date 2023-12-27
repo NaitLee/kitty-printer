@@ -43,10 +43,6 @@ export default function Printer(props: PrinterProps) {
         return data;
     }, {});
 
-    let [finishFeed] = useLocalStorage<number>('finishFeed', 120);
-    let [speed] = useLocalStorage<number>('speed', 32);
-    let [energy] = useLocalStorage<number>('energy', 0x5000);
-
     let [settingsVisible, setSettingsVisible] = useState(false)
 
     const stuffs = props.stuffs;
@@ -63,6 +59,10 @@ export default function Printer(props: PrinterProps) {
         )}
     </div>;
     const print = async () => {
+        let speed = localStorage.getItem("speed");
+        let energy = localStorage.getItem("energy");
+        let finishFeed = localStorage.getItem("finishFeed");
+
         const device = await navigator.bluetooth.requestDevice({
             filters: [{ services: [ CAT_ADV_SRV ] }],
             optionalServices: [ CAT_PRINT_SRV ]
