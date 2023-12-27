@@ -8,6 +8,8 @@ import { _ } from "../common/i18n.tsx";
 import { CatPrinter } from "../common/cat-protocol.ts";
 import { delay } from "https://deno.land/std@0.193.0/async/delay.ts";
 import {useLocalStorage} from "../common/hooks.ts";
+import Settings from "./Settings.tsx";
+import { useState } from "preact/hooks";
 
 declare let navigator: Navigator & {
     // deno-lint-ignore no-explicit-any
@@ -44,6 +46,8 @@ export default function Printer(props: PrinterProps) {
     let [finishFeed] = useLocalStorage<number>('finishFeed', 120);
     let [speed] = useLocalStorage<number>('speed', 32);
     let [energy] = useLocalStorage<number>('energy', 0x5000);
+
+    let [settingsVisible, setSettingsVisible] = useState(false)
 
     const stuffs = props.stuffs;
     if (stuffs.length === 0)
@@ -108,10 +112,16 @@ export default function Printer(props: PrinterProps) {
             if (server) server.disconnect();
         }
     };
-    const print_menu = <div class="print-menu">
-        <button class="stuff stuff--button" aria-label={_('print')} onClick={print}>
-            <Icons.IconPrinter />
-        </button>
+    const print_menu = <div>
+        <div class="print-menu">
+            <button class="stuff stuff--button" style={{width:"80%"}} aria-label={_('print')} onClick={print}>
+                <Icons.IconPrinter />
+            </button>
+            <button class="stuff stuff--button" style={{width:"20%"}} aria-label={_('settings')} onClick={()=>setSettingsVisible(!settingsVisible)}>
+                <Icons.IconSettings />
+            </button>
+        </div>
+        <Settings visible={settingsVisible}/>
     </div>;
     return <>
         {preview}

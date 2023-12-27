@@ -24,6 +24,7 @@ import IconFlipHorizontal from "tabler_icons_tsx/tsx/flip-horizontal.tsx";
 import IconArrowBarUp from "tabler_icons_tsx/tsx/arrow-bar-up.tsx";
 import IconArrowBarDown from "tabler_icons_tsx/tsx/arrow-bar-down.tsx";
 import IconPrinter from "tabler_icons_tsx/tsx/printer.tsx";
+import IconSettings from "tabler_icons_tsx/tsx/settings.tsx";
 import { INL_ICON_COLOR, INL_ICON_SIZE } from "./constants.ts";
 
 export const Icons = {
@@ -53,6 +54,7 @@ export const Icons = {
     IconArrowBarDown,
     IconX,
     IconPrinter,
+    IconSettings
 };
 
 for (const key in Icons) {

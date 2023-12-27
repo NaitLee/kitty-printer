@@ -2,11 +2,9 @@ import { createRef } from "preact";
 import { _ } from "../common/i18n.tsx";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { NavProps } from "../common/types.ts";
-import Settings from "../components/Settings.tsx";
 
 export default function NavBar(props: NavProps) {
     const ref_about = createRef();
-    const ref_settings = createRef();
     const url = new URL(props.url);
     return <>
         <nav class="nav">
@@ -17,9 +15,6 @@ export default function NavBar(props: NavProps) {
             </div>
             <div class="nav-links">
                 <a class="nav-links__link" href="javascript:" onClick={() => ref_about.current.classList.toggle('about--visible')}>{_('about')}</a>
-            </div>
-            <div class="nav-links">
-                <a class="nav-links__link" href="javascript:" onClick={() => ref_settings.current.classList.toggle('settings--visible')}>{_('Settings')}</a>
             </div>
         </nav>
         <div class="about" ref={ref_about}>
@@ -36,9 +31,6 @@ export default function NavBar(props: NavProps) {
                     />
                 </a>
             </p>
-        </div>
-        <div class="settings" ref={ref_settings}>
-            <Settings/>
         </div>
         <noscript>
             <p class="noscript">

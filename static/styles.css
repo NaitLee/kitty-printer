@@ -371,6 +371,7 @@ p {
 
 .print-menu {
     margin: 0 1em;
+    display: flex;
 }
 
 .fresh-logo {
@@ -415,4 +416,19 @@ p {
     .fresh-logo {
         background: url('https://fresh.deno.dev/fresh-badge-dark.svg');
     }
+}
+
+.print-menu > .stuff--button{
+    margin: 5px;
+}
+
+.print__options-container {
+    max-height: 0;
+    transition: max-height 0.2s cubic-bezier(.08,.82,.17,1);
+    overflow-x: visible;
+    overflow-y: auto;
+}
+.print__options-container:focus-within,
+.print__options-container--visible {
+    max-height: 12em;
 }
