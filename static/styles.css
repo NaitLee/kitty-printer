@@ -243,6 +243,10 @@ p {
     box-sizing: content-box;
 }
 
+.kitty-preview > img {
+    width: 100%;
+}
+
 .stuff {
     border: 1px solid var(--gray-1);
     transition: box-shadow 0.2s ease;
