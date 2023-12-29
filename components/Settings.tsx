@@ -3,11 +3,9 @@ import {_} from "../common/i18n.tsx";
 import {Icons} from "../common/icons.tsx";
 
 export default function ({visible}:{visible:boolean}){
-    let [finishFeed, setFinishFeed] = useLocalStorage<number>('finishFeed', 120);
+    let [finishFeed, setFinishFeed] = useLocalStorage<number>('finishFeed', 100);
     let [speed, setSpeed] = useLocalStorage<number>('speed', 32);
-    let [energy, setEnergy] = useLocalStorage<number>('energy', 0x5000);
-
-    //TODO: Make hard limits for the values
+    let [energy, setEnergy] = useLocalStorage<number>('energy', 24000);
 
     return <div className={`${visible?"print__options-container--visible":""} print__options-container`}>
         <div className="stuff__option">
@@ -53,19 +51,19 @@ export default function ({visible}:{visible:boolean}){
 
         <div className="stuff__option">
             <span className="option__title">{_('Energy')}</span>
-            <button className="option__item" value={0x4000}
-                    onClick={()=>setEnergy(0x4000)}
-                    data-selected={energy === 0x4000}>
+            <button className="option__item" value={12000}
+                    onClick={()=>setEnergy(12000)}
+                    data-selected={energy === 12000}>
                 <span className="stuff__label">{_('Low')}</span>
             </button>
-            <button className="option__item" value={0x5000}
-                    onClick={()=>setEnergy(0x5000)}
-                    data-selected={energy === 0x5000}>
+            <button className="option__item" value={24000}
+                    onClick={()=>setEnergy(24000)}
+                    data-selected={energy === 24000}>
                 <span className="stuff__label">{_('Medium')}</span>
             </button>
-            <button className="option__item" value={0x6000}
-                    onClick={()=>setEnergy(0x6000)}
-                    data-selected={energy === 0x6000}>
+            <button className="option__item" value={48000}
+                    onClick={()=>setEnergy(48000)}
+                    data-selected={energy === 48000}>
                 <span className="stuff__label">{_('High')}</span>
             </button>
 
