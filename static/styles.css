@@ -57,7 +57,7 @@ input[type="text"] {
 }
 input[type="number"],
 input[inputmode="numeric"] {
-    width: 4em;
+    width: 6em;
 }
 
 button,
@@ -198,8 +198,23 @@ p {
     margin-bottom: 1em;
     transition: height 0.3s cubic-bezier(.08,.82,.17,1);
 }
+
+.settings {
+    text-align: center;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+    border-bottom: 1px solid var(--gray-1);
+    margin-bottom: 1em;
+    transition: height 0.3s cubic-bezier(.08,.82,.17,1);
+}
 .about--visible {
     height: 10em;
+    pointer-events: unset;
+}
+
+.settings--visible {
+    height: 15em;
     pointer-events: unset;
 }
 
@@ -226,6 +241,10 @@ p {
     border-radius: 4px;
     /* don't shrink content */
     box-sizing: content-box;
+}
+
+.kitty-preview > img {
+    width: 100%;
 }
 
 .stuff {
@@ -356,6 +375,7 @@ p {
 
 .print-menu {
     margin: 0 1em;
+    display: flex;
 }
 
 .fresh-logo {
@@ -400,4 +420,19 @@ p {
     .fresh-logo {
         background: url('https://fresh.deno.dev/fresh-badge-dark.svg');
     }
+}
+
+.print-menu > .stuff--button{
+    margin: 5px;
+}
+
+.print__options-container {
+    max-height: 0;
+    transition: max-height 0.2s cubic-bezier(.08,.82,.17,1);
+    overflow-x: visible;
+    overflow-y: auto;
+}
+.print__options-container:focus-within,
+.print__options-container--visible {
+    max-height: 12em;
 }

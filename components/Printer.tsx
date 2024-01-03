@@ -7,6 +7,9 @@ import { Icons } from "../common/icons.tsx";
 import { _ } from "../common/i18n.tsx";
 import { CatPrinter } from "../common/cat-protocol.ts";
 import { delay } from "https://deno.land/std@0.193.0/async/delay.ts";
+import {useLocalStorage} from "../common/hooks.ts";
+import Settings from "./Settings.tsx";
+import { useState } from "preact/hooks";
 
 declare let navigator: Navigator & {
     // deno-lint-ignore no-explicit-any
@@ -39,6 +42,9 @@ export default function Printer(props: PrinterProps) {
         data[update.index] = update;
         return data;
     }, {});
+
+    let [settingsVisible, setSettingsVisible] = useState(false)
+
     const stuffs = props.stuffs;
     if (stuffs.length === 0)
         return <div class="kitty-preview">
@@ -53,6 +59,10 @@ export default function Printer(props: PrinterProps) {
         )}
     </div>;
     const print = async () => {
+        let speed = localStorage.getItem("speed");
+        let energy = localStorage.getItem("energy");
+        let finishFeed = localStorage.getItem("finishFeed");
+
         const device = await navigator.bluetooth.requestDevice({
             filters: [{ services: [ CAT_ADV_SRV ] }],
             optionalServices: [ CAT_PRINT_SRV ]
@@ -81,8 +91,7 @@ export default function Printer(props: PrinterProps) {
                 .then(() => rx.addEventListener('characteristicvaluechanged', notifier))
                 .catch((error: Error) => console.log(error));
 
-            // TODO: configurable speed & energy
-            await printer.prepare(32, 0x5000);
+            await printer.prepare(speed, energy);
             for (const stuff of stuffs) {
                 const data = bitmap_data[stuff.id];
                 const bitmap = rgbaToBits(new Uint32Array(data.data.buffer));
@@ -95,18 +104,24 @@ export default function Printer(props: PrinterProps) {
                         await printer.draw(line);
                 }
             }
-            // TODO: configurable feed
-            await printer.finish(128);
+
+            await printer.finish(finishFeed);
             await rx.stopNotifications().then(() => rx.removeEventListener('characteristicvaluechanged', notifier));
         } finally {
             await delay(500);
             if (server) server.disconnect();
         }
     };
-    const print_menu = <div class="print-menu">
-        <button class="stuff stuff--button" aria-label={_('print')} onClick={print}>
-            <Icons.IconPrinter />
-        </button>
+    const print_menu = <div>
+        <div class="print-menu">
+            <button class="stuff stuff--button" style={{width:"80%"}} aria-label={_('print')} onClick={print}>
+                <Icons.IconPrinter />
+            </button>
+            <button class="stuff stuff--button" style={{width:"20%"}} aria-label={_('settings')} onClick={()=>setSettingsVisible(!settingsVisible)}>
+                <Icons.IconSettings />
+            </button>
+        </div>
+        <Settings visible={settingsVisible}/>
     </div>;
     return <>
         {preview}
