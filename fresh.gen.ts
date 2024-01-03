@@ -6,6 +6,7 @@ import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $api_lang from "./routes/api/lang.ts";
 import * as $index from "./routes/index.tsx";
+import * as $DynamicManifest from "./islands/DynamicManifest.tsx";
 import * as $KittyCanvas from "./islands/KittyCanvas.tsx";
 import * as $Nav from "./islands/Nav.tsx";
 import * as $PwaUpdate from "./islands/PwaUpdate.tsx";
@@ -19,6 +20,7 @@ const manifest = {
     "./routes/index.tsx": $index,
   },
   islands: {
+    "./islands/DynamicManifest.tsx": $DynamicManifest,
     "./islands/KittyCanvas.tsx": $KittyCanvas,
     "./islands/Nav.tsx": $Nav,
     "./islands/PwaUpdate.tsx": $PwaUpdate,

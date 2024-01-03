@@ -12,7 +12,7 @@ export default function ({ visible }: { visible: boolean }) {
     const unit_label = (dots: number) => {
         const inches = dots / DEF_DPI;
         const centimeters = inches * IN_TO_CM;
-        return `${_('0-in-1-cm', [round_to(inches, 2), round_to(centimeters, 2)])}`;
+        return _('0-in-1-cm', [round_to(inches, 2), round_to(centimeters, 2)]);
     };
 
     return <div className={`${visible ? "print__options-container--visible" : ""} print__options-container`}>

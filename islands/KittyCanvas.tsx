@@ -1,11 +1,10 @@
-import { useEffect, useReducer } from "preact/hooks";
+import { useReducer } from "preact/hooks";
 import { DEF_PIC_URL, STUFF_STOREKEY } from "../common/constants.ts";
-import { _ } from "../common/i18n.tsx";
+import { _, i18nEvent } from "../common/i18n.tsx";
 import { Icons } from "../common/icons.tsx";
 import { KittyCanvasProps, StuffData, StuffUpdate } from "../common/types.ts";
 import Printer from "../components/Printer.tsx";
 import Stuff from "../components/Stuff.tsx";
-import { IS_BROWSER } from "$fresh/runtime.ts";
 
 function timestamp() {
     return new Date().getTime();
@@ -46,20 +45,15 @@ function properStuff(stuff: StuffData) {
 }
 
 export default function KittyCanvas(props: KittyCanvasProps) {
-    const initial_stuffs: StuffData[] = [
-        { type: 'text', id: 0, textContent: _('welcome').value, textAlign: 'center', textFontSize: 24 },
-        { type: 'pic', id: 1, picUrl: DEF_PIC_URL }
-    ];
-    let stored_stuffs: StuffData[];
+    let stuff_store: StuffData[];
     try {
-        //@ts-expect-error:
-        stored_stuffs = JSON.parse(localStorage.getItem(STUFF_STOREKEY)).map(s => properStuff(s));
-        if (stored_stuffs.length === 0) throw new Error();
+        //@ts-expect-error: many would go wrong, just reset in case
+        stuff_store = JSON.parse(localStorage.getItem(STUFF_STOREKEY)).map(s => properStuff(s));
+        if (stuff_store.length === 0) throw new Error();
     } catch (_error) {
-        // console.error(error);
-        stored_stuffs = initial_stuffs.map(s => properStuff(s));
+        stuff_store = [];
         if (typeof localStorage === 'object') // unavailable in deno deploy
-            localStorage.setItem(STUFF_STOREKEY, JSON.stringify(stored_stuffs));
+            localStorage.setItem(STUFF_STOREKEY, JSON.stringify(stuff_store));
     }
     const [stuffs, dispatch] = useReducer<StuffData[], StuffUpdate>((data, update) => {
         const stuff = update.stuff;
@@ -105,7 +99,20 @@ export default function KittyCanvas(props: KittyCanvasProps) {
         data = data.filter(s => s.type !== 'void').map(s => (s.id = newid++, s)).map(s => properStuff(s));
         localStorage.setItem(STUFF_STOREKEY, JSON.stringify(data));
         return data;
-    }, stored_stuffs);
+    }, stuff_store);
+    if (stuffs.length === 0)
+        i18nEvent.addEventListener('ready', () => {
+            const initials: StuffData[] = [
+                { type: 'text', id: 0, textContent: _('welcome').value, textAlign: 'center', textFontSize: 24 },
+                { type: 'pic', id: 1, picUrl: DEF_PIC_URL }
+            ];
+            initials.map(s => properStuff(s)).forEach(s => {
+                dispatch({
+                    action: 'add',
+                    stuff: s
+                });
+            });
+        });
     const comp = <div class="kitty-container">
         <div class="kitty-canvas">
             {stuffs.map(stuff => Stuff({ dispatch, stuff }))}

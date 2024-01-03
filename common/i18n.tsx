@@ -13,6 +13,8 @@ const records: {
     record: Signal<string>
 }[] = [];
 
+export const i18nEvent = new EventTarget();
+
 if (!IS_BROWSER) {
     await fetch(new URL(`../${STATICDIR}/${LANGDIR}/${LANGDB}`, import.meta.url))
         .then(r => r.json())
@@ -23,6 +25,7 @@ if (!IS_BROWSER) {
                 .then(r => r.json()).then(data => i18n.update(lang, data));
         }))
     );
+    i18nEvent.dispatchEvent(new Event('ready'));
 }
 
 function mktranslate(): (string: string, things?: Thing | Things) => Signal<string> {
@@ -40,6 +43,7 @@ function mktranslate(): (string: string, things?: Thing | Things) => Signal<stri
                 records.forEach(record => {
                     record.record.value = i18n._(record.string, record.things);
                 });
+                i18nEvent.dispatchEvent(new Event('ready'));
             });
     }
     return function (string, things) {
