@@ -1,6 +1,6 @@
-import { useReducer } from "preact/hooks";
+import { useEffect, useReducer } from "preact/hooks";
 import { DEF_PIC_URL, STUFF_STOREKEY } from "../common/constants.ts";
-import { _, i18nEvent } from "../common/i18n.tsx";
+import { _, i18nReady } from "../common/i18n.tsx";
 import { Icons } from "../common/icons.tsx";
 import { KittyCanvasProps, StuffData, StuffUpdate } from "../common/types.ts";
 import Printer from "../components/Printer.tsx";
@@ -100,19 +100,21 @@ export default function KittyCanvas(props: KittyCanvasProps) {
         localStorage.setItem(STUFF_STOREKEY, JSON.stringify(data));
         return data;
     }, stuff_store);
-    if (stuffs.length === 0)
-        i18nEvent.addEventListener('ready', () => {
-            const initials: StuffData[] = [
-                { type: 'text', id: 0, textContent: _('welcome').value, textAlign: 'center', textFontSize: 24 },
-                { type: 'pic', id: 1, picUrl: DEF_PIC_URL }
-            ];
-            initials.map(s => properStuff(s)).forEach(s => {
-                dispatch({
-                    action: 'add',
-                    stuff: s
+    useEffect(() => {
+        if (stuffs.length === 0)
+            i18nReady(() => {
+                const initials: StuffData[] = [
+                    { type: 'text', id: 0, textContent: _('welcome').value, textAlign: 'center', textFontSize: 24 },
+                    { type: 'pic', id: 1, picUrl: DEF_PIC_URL }
+                ];
+                initials.map(s => properStuff(s)).forEach(s => {
+                    dispatch({
+                        action: 'add',
+                        stuff: s
+                    });
                 });
             });
-        });
+    });
     const comp = <div class="kitty-container">
         <div class="kitty-canvas">
             {stuffs.map(stuff => Stuff({ dispatch, stuff }))}
