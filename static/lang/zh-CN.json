@@ -30,7 +30,7 @@
     "welcome": "欢迎！",
     "brightness": "亮度",
     "print": "打印",
-    "alpha": "实验版",
+    "version^alpha": "实验版",
     "about": "关于",
     "kitty-printer-app-logo-a-blue-kitty": "Kitty Printer 应用 Logo: 蓝色猫猫头",
     "stuff-picture-0": "物件：照片 {0}",
@@ -40,5 +40,16 @@
     "this-application-requires-javascript-to-operate": "此应用需要 JavaScript。",
     "javascript-license-information": "JavaScript 许可证信息",
     "check-source-code": "查验源代码",
-    "attention-your-browser-doesnt-have-bluetooth-support": "注意！您的浏览器无蓝牙功能"
+    "attention-your-browser-doesnt-have-bluetooth-support": "注意！您的浏览器无蓝牙功能",
+    "finish-feed": "额外送纸",
+    "0-in-1-cm": "{0} 英寸 / {1} 厘米",
+    "speed": "送纸速度",
+    "strength": "打印力度",
+    "speed^quick": "很快",
+    "speed^fast": "快",
+    "speed^normal": "正常",
+    "strength^low": "低",
+    "strength^medium": "中",
+    "strength^high": "高",
+    "tap-the-picture-to-change": "点击照片以更换"
 }

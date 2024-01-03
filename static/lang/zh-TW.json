@@ -30,7 +30,7 @@
     "welcome": "歡迎！",
     "brightness": "亮度",
     "print": "列印",
-    "alpha": "實驗版",
+    "version^alpha": "實驗版",
     "about": "關於",
     "kitty-printer-app-logo-a-blue-kitty": "Kitty Printer 應用 Logo: 藍色貓貓頭",
     "stuff-picture-0": "物件：照片 {0}",
@@ -40,5 +40,16 @@
     "this-application-requires-javascript-to-operate": "此應用需要 JavaScript。",
     "javascript-license-information": "JavaScript 許可證資訊",
     "check-source-code": "查驗原始碼",
-    "attention-your-browser-doesnt-have-bluetooth-support": "注意！您的瀏覽器無藍芽功能"
+    "attention-your-browser-doesnt-have-bluetooth-support": "注意！您的瀏覽器無藍芽功能",
+    "finish-feed": "額外送紙",
+    "0-in-1-cm": "{0} 英寸 / {1} 釐米",
+    "speed": "送紙速度",
+    "strength": "列印力度",
+    "speed^quick": "很快",
+    "speed^fast": "快",
+    "speed^normal": "正常",
+    "strength^low": "低",
+    "strength^medium": "中",
+    "strength^high": "高",
+    "tap-the-picture-to-change": "點選照片以更換"
 }

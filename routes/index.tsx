@@ -2,6 +2,7 @@ import { Head } from "$fresh/runtime.ts";
 import KittyCanvas from "../islands/KittyCanvas.tsx";
 import { _ } from "../common/i18n.tsx";
 import Nav from "../islands/Nav.tsx";
+import PwaUpdate from "../islands/PwaUpdate.tsx";
 
 export { handler } from "../common/i18n.tsx";
 
@@ -14,11 +15,9 @@ export default function Home(request: Request) {
 				rel="manifest"
 				href="/manifest.json"
 			/>
+			{/* TODO: a service worker */}
+			{/* <PwaUpdate /> */}
         </Head>
-		<script type="module">
-			import "https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate/dist/pwa-update.js"; const
-			el = document.createElement("pwa-update"); document.body.appendChild(el);
-		</script>
         <Nav url={request.url} />
         <KittyCanvas />
     </>;

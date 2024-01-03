@@ -11,7 +11,7 @@ export default function NavBar(props: NavProps) {
             <div class="nav-title">
                 <img class="title__logo" src="kitty.svg" alt={_('kitty-printer-app-logo-a-blue-kitty')} width={36} height={36} />
                 <h1 class="title__header">{_('kitty-printer')}</h1>
-                <span class="title__tag">{_('alpha')}</span>
+                <span class="title__tag">{_('version^alpha')}</span>
             </div>
             <div class="nav-links">
                 <a class="nav-links__link" href="javascript:" onClick={() => ref_about.current.classList.toggle('about--visible')}>{_('about')}</a>
@@ -28,6 +28,8 @@ export default function NavBar(props: NavProps) {
                         height="37"
                         src="https://fresh.deno.dev/fresh-badge.svg"
                         alt="Made with Fresh"
+                        loading="lazy"
+                        async={true}
                     />
                 </a>
             </p>

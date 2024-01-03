@@ -30,7 +30,7 @@
     "welcome": "Welcome!",
     "brightness": "Brightness",
     "print": "Print",
-    "alpha": "Alpha",
+    "version^alpha": "Alpha",
     "about": "About",
     "kitty-printer-app-logo-a-blue-kitty": "Kitty Printer App Logo: A blue kitty",
     "stuff-picture-0": "Stuff: Picture {0}",
@@ -40,5 +40,16 @@
     "this-application-requires-javascript-to-operate": "This application requires JavaScript to Operate.",
     "javascript-license-information": "JavaScript License Information",
     "check-source-code": "Check Source Code",
-    "attention-your-browser-doesnt-have-bluetooth-support": "Attention! Your browser doesn’t have bluetooth support"
+    "attention-your-browser-doesnt-have-bluetooth-support": "Attention! Your browser doesn’t have bluetooth support",
+    "finish-feed": "Finish Feed",
+    "0-in-1-cm": "{0} in, {1} cm",
+    "speed": "Speed",
+    "strength": "Strength",
+    "speed^quick": "Quick",
+    "speed^fast": "Fast",
+    "speed^normal": "Normal",
+    "strength^low": "Low",
+    "strength^medium": "Medium",
+    "strength^high": "High",
+    "tap-the-picture-to-change": "Tap the picture to change"
 }

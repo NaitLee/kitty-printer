@@ -2,7 +2,7 @@ import { JSX } from "preact/jsx-runtime";
 import { Icons } from "../common/icons.tsx";
 import { IconKey, StuffData, StuffProps } from "../common/types.ts";
 import { _ } from "../common/i18n.tsx";
-import { DEF_CANVAS_WIDTH } from "../common/constants.ts";
+import { DEF_CANVAS_WIDTH, DEF_PIC_URL } from "../common/constants.ts";
 import { useState } from "preact/hooks";
 import { createRef } from "preact";
 
@@ -184,6 +184,7 @@ export default function Stuff(props: StuffProps) {
             type = 'pic';
             icon = 'IconPhoto';
             body = <>
+                {stuff.picUrl === DEF_PIC_URL ? <p class="stuff__hint">{_('tap-the-picture-to-change')}</p> : void 0}
                 <div class="stuff__pic-box">
                     <img class="stuff__pic" src={stuff.picUrl} onClick={choose_pic}
                         alt={_('stuff-picture-0', stuff.id)} style={`

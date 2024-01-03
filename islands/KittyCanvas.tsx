@@ -1,10 +1,11 @@
-import { useReducer } from "preact/hooks";
-import { DEF_CANVAS_WIDTH, STUFF_PAINT_INIT_URL, STUFF_STOREKEY } from "../common/constants.ts";
+import { useEffect, useReducer } from "preact/hooks";
+import { DEF_PIC_URL, STUFF_STOREKEY } from "../common/constants.ts";
 import { _ } from "../common/i18n.tsx";
 import { Icons } from "../common/icons.tsx";
 import { KittyCanvasProps, StuffData, StuffUpdate } from "../common/types.ts";
 import Printer from "../components/Printer.tsx";
 import Stuff from "../components/Stuff.tsx";
+import { IS_BROWSER } from "$fresh/runtime.ts";
 
 function timestamp() {
     return new Date().getTime();
@@ -35,7 +36,7 @@ function properStuff(stuff: StuffData) {
                 flipH: false,
                 flipV: false,
                 brightness: 128,
-                picUrl: 'kitty.svg',
+                picUrl: DEF_PIC_URL,
                 picFlipH: false,
                 picFlipV: false
             }, stuff);
@@ -47,7 +48,7 @@ function properStuff(stuff: StuffData) {
 export default function KittyCanvas(props: KittyCanvasProps) {
     const initial_stuffs: StuffData[] = [
         { type: 'text', id: 0, textContent: _('welcome').value, textAlign: 'center', textFontSize: 24 },
-        { type: 'pic', id: 1, picUrl: 'kitty.svg' }
+        { type: 'pic', id: 1, picUrl: DEF_PIC_URL }
     ];
     let stored_stuffs: StuffData[];
     try {

@@ -1,73 +1,47 @@
-import {useLocalStorage} from "../common/hooks.ts";
-import {_} from "../common/i18n.tsx";
-import {Icons} from "../common/icons.tsx";
+import { DEF_DPI, DEF_ENERGY, DEF_FINISH_FEED, DEF_SPEED, ENERGY_RANGE, IN_TO_CM, SPEED_RANGE } from "../common/constants.ts";
+import { useLocalStorage } from "../common/hooks.ts";
+import { _ } from "../common/i18n.tsx";
+import { round_to } from "../common/utility.ts";
 
-export default function ({visible}:{visible:boolean}){
-    let [finishFeed, setFinishFeed] = useLocalStorage<number>('finishFeed', 100);
-    let [speed, setSpeed] = useLocalStorage<number>('speed', 32);
-    let [energy, setEnergy] = useLocalStorage<number>('energy', 24000);
+export default function ({ visible }: { visible: boolean }) {
+    const [finish_feed, set_finish_feed] = useLocalStorage<number>('finishFeed', DEF_FINISH_FEED);
+    const [speed, set_speed] = useLocalStorage<number>('speed', DEF_SPEED);
+    const [energy, set_energy] = useLocalStorage<number>('energy', DEF_ENERGY);
 
-    return <div className={`${visible?"print__options-container--visible":""} print__options-container`}>
+    const mkset = (f: (value: number) => void) => (e: Event) => f(+(e.target as HTMLInputElement).value);
+    const unit_label = (dots: number) => {
+        const inches = dots / DEF_DPI;
+        const centimeters = inches * IN_TO_CM;
+        return `${_('0-in-1-cm', [round_to(inches, 2), round_to(centimeters, 2)])}`;
+    };
+
+    return <div className={`${visible ? "print__options-container--visible" : ""} print__options-container`}>
         <div className="stuff__option">
-            <span className="option__title">{_('Finish feed')}</span>
-            <button className="option__item" value="0"
-                    onClick={()=>setFinishFeed(0)}
-                    data-selected={finishFeed === 0}>
-                <span className="stuff__label">{_('0')}</span>
-            </button>
-            <button className="option__item" value="50"
-                    onClick={()=>setFinishFeed(50)}
-                    data-selected={finishFeed === 50}>
-                <span className="stuff__label">{_('50')}</span>
-            </button>
-            <button className="option__item" value="100"
-                    onClick={()=>setFinishFeed(100)}
-                    data-selected={finishFeed === 100}>
-                <span className="stuff__label">{_('100')}</span>
-            </button>
-            <input className="option__item" type="number" min={0} max={65535} value={finishFeed} onInput={(e:any)=>setFinishFeed(+e.target.value)}/>
+            <span className="option__title">{_('finish-feed')}</span>
+            <input className="option__item" type="range" min={0} max={DEF_DPI * 2}
+                step={DEF_DPI / IN_TO_CM / 2} value={finish_feed} onInput={mkset(set_finish_feed)} />
+            <span>{unit_label(finish_feed)}</span>
         </div>
 
         <div className="stuff__option">
-            <span className="option__title">{_('Speed')}</span>
-            <button className="option__item" value="8"
-                    onClick={()=>setSpeed(8)}
-                    data-selected={speed === 8}>
-                <span className="stuff__label">{_('Fastest')}</span>
-            </button>
-            <button className="option__item" value="16"
-                    onClick={()=>setSpeed(16)}
-                    data-selected={speed === 16}>
-                <span className="stuff__label">{_('Fast')}</span>
-            </button>
-            <button className="option__item" value="32"
-                    onClick={()=>setSpeed(32)}
-                    data-selected={speed === 32}>
-                <span className="stuff__label">{_('Good Quality')}</span>
-            </button>
-
-            <input className="option__item" type="number" min={4} max={255} value={speed} onInput={(e:any)=>setSpeed(+e.target.value)}/>
+            <span className="option__title">{_('speed')}</span>
+            {Object.entries(SPEED_RANGE).map(([label, speed_]) => <button className="option__item" value={speed_}
+                    onClick={() => set_speed(speed_)}
+                    data-selected={speed === speed_}>
+                <span className="stuff__label">{_(label)}</span>
+            </button>)}
+            <input className="option__item" type="number" min={4} max={0xff} value={speed} onInput={mkset(set_speed)}/>
         </div>
 
         <div className="stuff__option">
-            <span className="option__title">{_('Energy')}</span>
-            <button className="option__item" value={12000}
-                    onClick={()=>setEnergy(12000)}
-                    data-selected={energy === 12000}>
-                <span className="stuff__label">{_('Low')}</span>
-            </button>
-            <button className="option__item" value={24000}
-                    onClick={()=>setEnergy(24000)}
-                    data-selected={energy === 24000}>
-                <span className="stuff__label">{_('Medium')}</span>
-            </button>
-            <button className="option__item" value={48000}
-                    onClick={()=>setEnergy(48000)}
-                    data-selected={energy === 48000}>
-                <span className="stuff__label">{_('High')}</span>
-            </button>
+            <span className="option__title">{_('strength')}</span>
+            {Object.entries(ENERGY_RANGE).map(([label, energy_]) => <button className="option__item" value={energy_}
+                    onClick={()=>set_energy(energy_)}
+                    data-selected={energy === energy_}>
+                <span className="stuff__label">{_(label)}</span>
+            </button>)}
 
-            <input className="option__item" type="number" min={0} max={0xFFFF} value={energy} onInput={(e:any)=>setEnergy(+e.target.value)}/>
+            <input className="option__item" type="number" min={0} max={0xFFFF} value={energy} onInput={mkset(set_energy)}/>
         </div>
-    </div>
+    </div>;
 }

@@ -33,6 +33,7 @@ html {
 
 body {
     margin: 0;
+    margin-bottom: 33vh;
 }
 
 h1, h2, h3 {
@@ -346,7 +347,6 @@ p {
     min-height: 8em;
     max-height: 400px;
     margin: 0 auto;
-    cursor: pointer;
     overflow-y: auto;
     border-radius: 0;
     background-color: var(--bottom);
@@ -355,6 +355,13 @@ p {
 }
 .stuff__pic {
     margin: auto;
+    cursor: pointer;
+}
+.stuff__hint {
+    text-align: center;
+    margin: 0;
+    padding: 8px;
+    background-color: var(--bottom);
 }
 
 .stuff__options-container {
@@ -374,7 +381,7 @@ p {
 }
 
 .print-menu {
-    margin: 0 1em;
+    margin: 0 calc(1em - 4px);
     display: flex;
 }
 
@@ -393,6 +400,24 @@ p {
     max-width: 100%;
     padding: 1em;
     margin: auto;
+}
+
+.print-menu > .stuff--button{
+    margin: 4px;
+}
+
+.print__options-container {
+    max-height: 0;
+    padding: 8px 0;
+    transition: max-height 0.2s cubic-bezier(.08,.82,.17,1);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    width: min(calc(16px + 2em + 384px), 100vw);
+}
+.print__options-container:focus-within,
+.print__options-container--visible {
+    max-height: 12em;
+    overflow-x: auto;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -420,19 +445,4 @@ p {
     .fresh-logo {
         background: url('https://fresh.deno.dev/fresh-badge-dark.svg');
     }
-}
-
-.print-menu > .stuff--button{
-    margin: 5px;
-}
-
-.print__options-container {
-    max-height: 0;
-    transition: max-height 0.2s cubic-bezier(.08,.82,.17,1);
-    overflow-x: visible;
-    overflow-y: auto;
-}
-.print__options-container:focus-within,
-.print__options-container--visible {
-    max-height: 12em;
 }

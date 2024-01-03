@@ -6,3 +6,7 @@ export function mkcanvas(width: number) {
     const ctx = canvas.getContext('2d')!;
     return { canvas, width, img, ctx };
 }
+
+export function round_to(n: number, d: number) {
+    return Math.round(n * (10 * d)) / (10 * d);
+}

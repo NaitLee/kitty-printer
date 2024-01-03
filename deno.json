@@ -6,35 +6,19 @@
     "build": "deno run -A dev.ts build",
     "preview": "deno run -A main.ts"
   },
-  "lint": {
-    "rules": {
-      "tags": [
-        "fresh",
-        "recommended"
-      ]
-    },
-    "exclude": [
-      "_fresh"
-    ]
-  },
+  "lint": { "rules": { "tags": ["fresh", "recommended"] } },
   "imports": {
-    "$fresh/": "https://deno.land/x/fresh@1.4.2/",
-    "preact": "https://esm.sh/preact@10.15.1",
-    "preact/": "https://esm.sh/preact@10.15.1/",
+    "$fresh/": "https://deno.land/x/fresh@1.6.1/",
+    "preact": "https://esm.sh/preact@10.19.2",
+    "preact/": "https://esm.sh/preact@10.19.2/",
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.1",
-    "@preact/signals": "https://esm.sh/*@preact/signals@1.1.3",
-    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.2.3",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.1",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.0",
+    "@pwabuilder/pwaupdate": "https://esm.sh/@pwabuilder/pwaupdate@0.2.1",
     "$std/": "https://deno.land/std@0.199.0/",
     "tabler_icons_tsx/": "https://deno.land/x/tabler_icons_tsx@0.0.3/",
     "canvas-txt": "https://esm.sh/canvas-txt@4.0.4"
   },
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact"
-  },
-  "fmt": {
-    "exclude": [
-      "_fresh"
-    ]
-  }
+  "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
+  "exclude": ["**/_fresh/*"]
 }

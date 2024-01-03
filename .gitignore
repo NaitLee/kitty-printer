@@ -4,3 +4,8 @@
 .env.test.local
 .env.production.local
 .env.local
+
+# Fresh build directory
+_fresh/
+
+*.kate-swp

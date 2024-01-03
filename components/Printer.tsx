@@ -1,13 +1,12 @@
 import { createRef } from "preact";
-import { CAT_ADV_SRV, CAT_PRINT_RX_CHAR, CAT_PRINT_SRV, CAT_PRINT_TX_CHAR, DEF_CANVAS_WIDTH, STUFF_PAINT_INIT_URL } from "../common/constants.ts";
+import { CAT_ADV_SRV, CAT_PRINT_RX_CHAR, CAT_PRINT_SRV, CAT_PRINT_TX_CHAR, DEF_CANVAS_WIDTH, DEF_ENERGY, DEF_FINISH_FEED, DEF_SPEED, STUFF_PAINT_INIT_URL } from "../common/constants.ts";
 import { BitmapData, PrinterProps } from "../common/types.ts";
 import StuffPainter from "./StuffPainter.tsx";
 import { useMemo, useReducer } from "preact/hooks";
 import { Icons } from "../common/icons.tsx";
 import { _ } from "../common/i18n.tsx";
 import { CatPrinter } from "../common/cat-protocol.ts";
-import { delay } from "https://deno.land/std@0.193.0/async/delay.ts";
-import {useLocalStorage} from "../common/hooks.ts";
+import { delay } from "$std/async/delay.ts";
 import Settings from "./Settings.tsx";
 import { useState } from "preact/hooks";
 
@@ -43,7 +42,7 @@ export default function Printer(props: PrinterProps) {
         return data;
     }, {});
 
-    let [settingsVisible, setSettingsVisible] = useState(false)
+    const [settingsVisible, setSettingsVisible] = useState(false)
 
     const stuffs = props.stuffs;
     if (stuffs.length === 0)
@@ -59,9 +58,9 @@ export default function Printer(props: PrinterProps) {
         )}
     </div>;
     const print = async () => {
-        let speed = localStorage.getItem("speed");
-        let energy = localStorage.getItem("energy");
-        let finishFeed = localStorage.getItem("finishFeed");
+        const speed = +(localStorage.getItem("speed") || DEF_SPEED);
+        const energy = +(localStorage.getItem("energy") || DEF_ENERGY);
+        const finish_feed = +(localStorage.getItem("finishFeed") || DEF_FINISH_FEED);
 
         const device = await navigator.bluetooth.requestDevice({
             filters: [{ services: [ CAT_ADV_SRV ] }],
@@ -79,14 +78,16 @@ export default function Printer(props: PrinterProps) {
                 tx.writeValueWithoutResponse.bind(tx),
                 false
             );
-            const notifier = () => {
+            const notifier = (event: Event) => {
                 //@ts-ignore:
                 const data: DataView = event.target.value;
                 const message = new Uint8Array(data.buffer);
                 printer.notify(message);
             };
 
-            // TODO: be aware of other printer state
+            let blank = 0;
+
+            // TODO: be aware of other printer state, like low power, no paper, overheat, etc.
             await rx.startNotifications()
                 .then(() => rx.addEventListener('characteristicvaluechanged', notifier))
                 .catch((error: Error) => console.log(error));
@@ -98,14 +99,21 @@ export default function Printer(props: PrinterProps) {
                 const pitch = data.width / 8 | 0;
                 for (let i = 0; i < data.height * pitch; i += pitch) {
                     const line = bitmap.slice(i, i + pitch);
-                    if (line.every(byte => byte === 0))
-                        await printer.feed(1);
-                    else
+                    if (line.every(byte => byte === 0)) {
+                        blank += 1;
+                    } else {
+                        if (blank > 0) {
+                            await printer.setSpeed(8);
+                            await printer.feed(blank);
+                            await printer.setSpeed(speed);
+                            blank = 0;
+                        }
                         await printer.draw(line);
+                    }
                 }
             }
 
-            await printer.finish(finishFeed);
+            await printer.finish(blank + finish_feed);
             await rx.stopNotifications().then(() => rx.removeEventListener('characteristicvaluechanged', notifier));
         } finally {
             await delay(500);
