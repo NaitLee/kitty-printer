@@ -35,7 +35,7 @@ export default function StuffPainter(props: StuffPainterProps) {
                 ctx.fillStyle = 'black';
                 ctx.strokeStyle = 'black';
                 ctx.textAlign = stuff.textAlign === 'justify' ? 'start' : stuff.textAlign!;
-                font = `${stuff.textFontWeight} ${stuff.textFontSize}px ${stuff.textFontFamily}`;
+                font = `${stuff.textFontWeight} ${stuff.textFontSize}px "${stuff.textFontFamily}"`;
                 // ctx.font is set multiple times intensionally
                 ctx.font = font;
                 strings = splitText({

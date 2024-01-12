@@ -100,7 +100,7 @@ export default function Stuff(props: StuffProps) {
                 <textarea class={"stuff__textfield" + (stuff.textStroked ? ' stuff__textfield--stroked' : '')}
                     style={`
                         text-align: ${stuff.textAlign};
-                        font-family: ${stuff.textFontFamily};
+                        font-family: "${stuff.textFontFamily}";
                         font-size: ${stuff.textFontSize}px;
                         font-weight: ${stuff.textFontWeight};
                         line-height: ${stuff.textFontSize! + stuff.textLineSpacing!}px;
