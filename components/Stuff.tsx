@@ -5,6 +5,7 @@ import { _ } from "../common/i18n.tsx";
 import { DEF_CANVAS_WIDTH, DEF_PIC_URL } from "../common/constants.ts";
 import { useState } from "preact/hooks";
 import { createRef } from "preact";
+import FontSelector from "./FontSelector.tsx";
 
 const commonsize = [
     0, 4, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 56, 60, 72, 84, 96, 120, 150, 180, 240, 280, 320, DEF_CANVAS_WIDTH
@@ -136,7 +137,8 @@ export default function Stuff(props: StuffProps) {
                 </div>
                 <div class="stuff__option">
                     <span class="option__title">{_('font')}</span>
-                    <input class="option__item" type="text" value={stuff.textFontFamily} onInput={mkmodify('textFontFamily')} />
+                    {/* <input class="option__item" type="text" value={stuff.textFontFamily} onInput={mkmodify('textFontFamily')} /> */}
+                    <FontSelector class="option__item" value={stuff.textFontFamily!} onChange={mkmodify('textFontFamily')} />
                 </div>
                 <div class="stuff__option">
                     <span class="option__title">{_('font-size')}</span>

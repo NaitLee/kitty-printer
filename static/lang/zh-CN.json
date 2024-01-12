@@ -51,5 +51,9 @@
     "strength^low": "低",
     "strength^medium": "中",
     "strength^high": "高",
-    "tap-the-picture-to-change": "点击照片以更换"
+    "tap-the-picture-to-change": "点击照片以更换",
+    "click-to-load-fonts": "点击以加载字体",
+    "serif": "衬线",
+    "sans-serif": "无衬线",
+    "monospace": "等宽"
 }

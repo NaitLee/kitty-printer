@@ -51,5 +51,9 @@
     "strength^low": "Low",
     "strength^medium": "Medium",
     "strength^high": "High",
-    "tap-the-picture-to-change": "Tap the picture to change"
+    "tap-the-picture-to-change": "Tap the picture to change",
+    "click-to-load-fonts": "Click to load fonts",
+    "serif": "Serif",
+    "sans-serif": "Sans-Serif",
+    "monospace": "Monospace"
 }
