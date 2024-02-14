@@ -52,8 +52,8 @@ export default function Printer(props: PrinterProps) {
     const preview_ref = createRef();
     const preview = <div ref={preview_ref} class="kitty-preview">
         {stuffs.map((stuff, index) =>
-            useMemo(() => <StuffPainter stuff={stuff} index={index}
-                dispatch={dispatch} width={DEF_CANVAS_WIDTH} />
+            useMemo(() => 
+                <StuffPainter stuff={stuff} index={index} dispatch={dispatch} width={DEF_CANVAS_WIDTH} />
             , [JSON.stringify(stuff)])
         )}
     </div>;
@@ -94,6 +94,14 @@ export default function Printer(props: PrinterProps) {
 
             await printer.prepare(speed, energy);
             for (const stuff of stuffs) {
+                if (stuff.offset) {
+                    await printer.setSpeed(8);
+                    if (stuff.offset > 0)
+                        await printer.feed(stuff.offset);
+                    else
+                        await printer.retract(-stuff.offset);
+                    await printer.setSpeed(speed);
+                }
                 const data = bitmap_data[stuff.id];
                 const bitmap = rgbaToBits(new Uint32Array(data.data.buffer));
                 const pitch = data.width / 8 | 0;

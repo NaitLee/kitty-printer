@@ -11,6 +11,7 @@ function timestamp() {
 }
 
 function properStuff(stuff: StuffData) {
+    stuff.offset = stuff.offset || 0;
     switch (stuff.type) {
         case 'text':
             stuff = Object.assign({
@@ -25,7 +26,7 @@ function properStuff(stuff: StuffData) {
                 textFontSize: 16,
                 textLineSpacing: (stuff.textFontSize || 16) / 2 | 0,
                 textFontWeight: '',
-                textOffset: 0
+                textShift: 0
             }, stuff);
             break;
         case 'pic':

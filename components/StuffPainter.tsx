@@ -56,7 +56,7 @@ export default function StuffPainter(props: StuffPainterProps) {
                         'center': (width / 2 - measured[i].width / 2) | 0,
                         'end': (width - measured[i].width) | 0,
                         'justify': 0
-                    })[stuff.textAlign!] + (stuff.textOffset! * width);
+                    })[stuff.textAlign!] + (stuff.textShift! * width);
                     anchor_y = line_height * (i + 1);
                     if (stuff.textStroked) {
                         ctx.strokeText(s, anchor_x, anchor_y);
@@ -92,16 +92,16 @@ export default function StuffPainter(props: StuffPainterProps) {
             height: canvas.height
         })
         msg = await new Promise<ImageWorkerMessage>(resolve => {
-            // { once: true } doesn't work here
             const callback = (event: MessageEvent<ImageWorkerMessage>) => {
                 if (event.data.id !== stuff.id) return;
+                // { once: true } doesn't work on this one
                 image_worker!.removeEventListener('message', callback);
                 resolve(event.data);
             };
             image_worker!.addEventListener('message', callback);
         });
-        canvas.width = msg.width;
-        canvas.height = msg.height;
+        stuff.width = canvas.width = msg.width;
+        stuff.height = canvas.height = msg.height;
         imagedata = new ImageData(new Uint8ClampedArray(msg.data), msg.width, msg.height);
         ctx.putImageData(imagedata, 0, 0);
         if (canvas.height !== 0) {
@@ -115,5 +115,7 @@ export default function StuffPainter(props: StuffPainterProps) {
             });
         }
     })();
-    return <img key={stuff.id} class="kitty-preview__stuff" src={imgsrc} alt={_('preview-0', stuff.id)} width={width} height={canvas.height} />;
+    return <div class="kitty-preview__stuff-box" style={`height:${Math.max(stuff.height! + stuff.offset!, 0)}px;top:${stuff.offset!}px`}>
+        <img key={stuff.id} class="kitty-preview__stuff" src={imgsrc} alt={_('preview-0', stuff.id)} width={width} height={canvas.height} />
+    </div>;
 }

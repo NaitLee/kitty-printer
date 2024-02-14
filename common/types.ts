@@ -4,14 +4,20 @@ import type { Icons } from "./icons.tsx";
 export type IconKey = keyof typeof Icons;
 
 export interface StuffData {
-    type: 'void' | 'text' | 'hr' | 'border' | 'pic';
+    type: 'void' | 'text' | 'hr' | 'border' | 'pic' | 'gap';
     id: number;
+
+    /* given after painting */
+    width?: number;
+    /* given after painting */
+    height?: number;
 
     dither?: 'pic' | 'pattern' | 'text';
     rotate?: 0 | 90 | 180 | 270;
     flipH?: boolean;
     flipV?: boolean;
     brightness?: number;
+    offset?: number;
 
     textContent?: string;
     textAlign?: 'start' | 'end' | 'center' | 'justify';
@@ -20,7 +26,7 @@ export interface StuffData {
     textLineSpacing?: number;
     textStroked?: boolean;
     textFontWeight?: '' | 'normal' | 'bold';
-    textOffset?: number;
+    textShift?: number;
 
     hrPadding?: number;
     hrStroke?: number;
@@ -32,6 +38,9 @@ export interface StuffData {
 
     picUrl?: string;
     picScale?: number;
+
+    gapHeight?: number;
+    gapFill?: 'blank' | 'solid';
 }
 
 export interface StuffProps {

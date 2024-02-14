@@ -1,6 +1,4 @@
 
-/// <reference path="../common/image.d.ts" />
-
 function rgbaToGray(rgba, brightness, alpha_as_white) {
     // use clamped array to prevent obscure bugs
     const mono = new Uint8ClampedArray(rgba.length);
@@ -23,11 +21,12 @@ function rgbaToGray(rgba, brightness, alpha_as_white) {
     return mono;
 }
 
-function grayToRgba(mono) {
+function grayToRgba(mono, white_as_transparent) {
     const rgba = new Uint32Array(mono.length);
     for (let i = 0; i < mono.length; ++i) {
+        const base = (mono[i] === 0xff && white_as_transparent) ? 0 : 0xff000000;
         // little endian
-        rgba[i] = 0xff000000 | (mono[i] << 16) | (mono[i] << 8) | mono[i];
+        rgba[i] = base | (mono[i] << 16) | (mono[i] << 8) | mono[i];
     }
     return rgba;
 }
@@ -163,7 +162,7 @@ self.addEventListener('message', function(event) {
         mono = rotate(mono, w, h, msg.rotate);
     else
         mono = rotate(mono, h, w, msg.rotate);
-    const out = grayToRgba(mono).buffer;
+    const out = grayToRgba(mono, true).buffer;
     if (msg.rotate === 0 || msg.rotate === 180)
         self.postMessage({
             id: msg.id,

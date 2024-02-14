@@ -236,16 +236,21 @@ p {
     max-width: 100%;
     padding: 8px;
     margin: 1em;
-    background-color: var(--bottom);
+    background-color: white;
     /* box-shadow: var(--gray-2) 0 0 4px; */
     border: 1px solid var(--gray-1);
     border-radius: 4px;
     /* don't shrink content */
     box-sizing: content-box;
 }
-
-.kitty-preview > img {
+.kitty-preview__stuff-box {
     width: 100%;
+    position: relative;
+    overflow-y: visible;
+}
+.kitty-preview__stuff {
+    width: 100%;
+    position: relative;
 }
 
 .stuff {
@@ -322,9 +327,12 @@ p {
     display: none;
 }
 
+.stuff__content:focus-within .stuff__textfield {
+    height: 12rem;
+}
 .stuff__textfield {
     width: 100%;
-    min-height: 10rem;
+    height: 3em;
     resize: vertical;
     overflow-x: hidden;
     overflow-y: auto;
@@ -332,6 +340,7 @@ p {
     background-color: var(--bottom);
     border: none;
     padding: 6px;
+    transition: height 0.3s cubic-bezier(.08,.82,.17,1);
 }
 
 .stuff__textfield--stroked {
@@ -378,6 +387,7 @@ p {
 .stuff__options {
     width: fit-content;
     margin: auto;
+    margin-bottom: 2em;
 }
 
 .print-menu {
@@ -440,7 +450,7 @@ p {
         filter: brightness(0.8);
     }
     .kitty-preview {
-        filter: brightness(0.6);
+        filter: brightness(0.67);
     }
     .fresh-logo {
         background: url('https://fresh.deno.dev/fresh-badge-dark.svg');

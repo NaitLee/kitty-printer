@@ -165,8 +165,8 @@ export default function Stuff(props: StuffProps) {
                 {/*
                 <div class="stuff__option">
                     <span class="option__title">{_('offset')}</span>
-                    <input class="option__item" type="range" min={-1} max={1} step={0.05} value={stuff.textOffset} onChange={mkmodifynumber('textOffset')} />
-                    <button class="option__item" onClick={mkmodifynumber('textOffset', 0)}>
+                    <input class="option__item" type="range" min={-1} max={1} step={0.05} value={stuff.textShift} onChange={mkmodifynumber('textShift')} />
+                    <button class="option__item" onClick={mkmodifynumber('textShift', 0)}>
                         <Icons.IconLayoutAlignMiddle />
                     </button>
                 </div>
@@ -174,11 +174,6 @@ export default function Stuff(props: StuffProps) {
                 <div class="stuff__option">
                     <span class="option__title">{_('stroked')}</span>
                     <input type="checkbox" onChange={mkmodifyboolean('textStroked')} checked={stuff.textStroked} />
-                </div>
-                <div class="stuff__option">
-                    <span class="option__title">{_('brightness')}</span>
-                    <input class="option__item" type="range" min={0} max={255} step={4}
-                        value={stuff.brightness} onChange={mkmodifynumber('brightness')} />
                 </div>
             </>;
             break;
@@ -249,11 +244,6 @@ export default function Stuff(props: StuffProps) {
                         <Icons.IconFlipHorizontal />
                     </label>
                 </div>
-                <div class="stuff__option">
-                    <span class="option__title">{_('brightness')}</span>
-                    <input class="option__item" type="range" min={0} max={255} step={4}
-                        value={stuff.brightness} onChange={mkmodifynumber('brightness')} />
-                </div>
             </>;
             break;
         default:
@@ -317,7 +307,25 @@ export default function Stuff(props: StuffProps) {
             onFocus={() => set_show_options(true)}
             onBlur={() => set_show_options(false)}
         >
-            <div class="stuff__options">{options}</div>
+            <div class="stuff__options">
+                {options}
+                <div class="stuff__option">
+                    <span class="option__title">{_('brightness')}</span>
+                    <input class="option__item" type="range" min={0} max={255} step={4}
+                        value={stuff.brightness} onChange={mkmodifynumber('brightness')} />
+                </div>
+                <div class="stuff__option">
+                    <span class="option__title">{_('offset')}</span>
+                    <button class="option__item" onClick={mkmodifynumber('offset', (stuff.offset || 0) - 4)}>
+                        <Icons.IconMinus />
+                    </button>
+                    <input class="option__item" type="text" inputMode="numeric" onInput={mkmodifynumber('offset')}
+                        value={stuff.offset} min={-DEF_CANVAS_WIDTH} max={DEF_CANVAS_WIDTH} step={1} />
+                    <button class="option__item" onClick={mkmodifynumber('offset', (stuff.offset || 0) + 4)}>
+                        <Icons.IconPlus />
+                    </button>
+                </div>
+            </div>
         </form>
         <div class="stuff__content">{body}</div>
     </div>;
