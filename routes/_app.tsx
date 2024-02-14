@@ -1,10 +1,10 @@
-import { AppContext } from "$fresh/server.ts";
-import { Head } from "$fresh/runtime.ts";
+import type { FreshContext } from "$fresh/server.ts";
+// import { Head } from "$fresh/runtime.ts";
 import { _, i18n } from "../common/i18n.tsx";
 import { acceptsLanguages } from "$std/http/mod.ts";
 
 // deno-lint-ignore require-await
-export default async function App(req: Request, ctx: AppContext) {
+export default async function App(req: Request, ctx: FreshContext) {
   i18n.reset();
   for (const lang of acceptsLanguages(req))
       if (Object.hasOwn(i18n.data, lang))
