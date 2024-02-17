@@ -55,5 +55,12 @@
     "click-to-load-fonts": "點選以載入字型",
     "serif": "襯線",
     "sans-serif": "無襯線",
-    "monospace": "等寬"
+    "monospace": "等寬",
+    "ENTER": "回車",
+    "SPACE": "空格",
+    "ESCAPE": "ESC",
+    "TAB": "Tab",
+    "COMMA": "逗號",
+    "DOT": "句號",
+    "": ""
 }

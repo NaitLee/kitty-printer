@@ -55,5 +55,12 @@
     "click-to-load-fonts": "Click to load fonts",
     "serif": "Serif",
     "sans-serif": "Sans-Serif",
-    "monospace": "Monospace"
+    "monospace": "Monospace",
+    "ENTER": "Enter",
+    "SPACE": "Space",
+    "ESCAPE": "Esc",
+    "TAB": "Tab",
+    "COMMA": "Comma",
+    "DOT": "Dot",
+    "": ""
 }

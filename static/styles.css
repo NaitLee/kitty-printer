@@ -430,6 +430,28 @@ p {
     overflow-x: auto;
 }
 
+#keyboard-shortcuts-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: visible;
+    pointer-events: all;
+    z-index: 2;
+}
+#keyboard-shortcuts-layer span {
+    display: inline-block;
+    position: absolute;
+    /* border: var(--border) dotted var(--fore-color); */
+    background-color: var(--bottom);
+    opacity: 0.75;
+    padding: 4px 8px;
+    white-space: pre;
+    line-height: 1em;
+    font-family: 'DejaVu Sans Mono', 'Hack', 'Consolas', monospace;
+    transform: translate(-1em, calc(0.33em * -1));
+}
+
 @media (prefers-color-scheme: dark) {
     :root {
         --fore: #e0e0e0;

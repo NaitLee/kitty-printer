@@ -109,6 +109,7 @@ export default function Stuff(props: StuffProps) {
                     onKeyUp={mkmodify('textContent')}
                     onBlur={mkmodify('textContent')}
                     placeholder={_('hello-world')}
+                    data-key=""
                 >{stuff.textContent}</textarea>
             </>;
             options = <>
@@ -189,7 +190,7 @@ export default function Stuff(props: StuffProps) {
                                 rotate(${stuff.rotate}deg)
                                 scaleX(${stuff.flipH ? -1 : 1})
                                 scaleY(${stuff.flipV ? -1 : 1});
-                        `} width={384} height={384} />
+                        `} width={384} height={384} data-key="" />
                 </div>
             </>;
             options = <>
@@ -262,7 +263,7 @@ export default function Stuff(props: StuffProps) {
             <div class="stuff__title">
                 <StuffIcon size={32} />
                 {!show_options ? <>
-                        <select onChange={change_type} name={'stuff-type-' + stuff.id.toString()}>
+                        <select onChange={change_type} name={'stuff-type-' + stuff.id.toString()} data-key="">
                             <option value="text" selected={type === 'text'}>{_('text')}</option>
                             <option value="pic" selected={type === 'pic'}>{_('picture')}</option>
                         </select>
@@ -295,7 +296,7 @@ export default function Stuff(props: StuffProps) {
                 <button key="remove" class="stuff__button" aria-label={_("remove")} onClick={() => dispatch({
                     action: 'remove',
                     stuff: stuff
-                })}>
+                })} data-key="">
                     <Icons.IconX />
                 </button>
             </div>

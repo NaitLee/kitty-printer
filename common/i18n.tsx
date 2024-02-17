@@ -67,6 +67,11 @@ function mktranslate(): (string: string, things?: Thing | Things) => Signal<stri
 export const _ = mktranslate();
 export const __ = i18n._;
 
+//@ts-ignore:
+globalThis._ = __;
+//@ts-ignore:
+globalThis.i18n = __;
+
 export function updateI18nFromRequest(request: Request) {
     i18n.reset();
     for (const lang of acceptsLanguages(request))

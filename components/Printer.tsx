@@ -130,10 +130,10 @@ export default function Printer(props: PrinterProps) {
     };
     const print_menu = <div>
         <div class="print-menu">
-            <button class="stuff stuff--button" style={{width:"80%"}} aria-label={_('print')} onClick={print}>
+            <button class="stuff stuff--button" style={{width:"80%"}} aria-label={_('print')} onClick={print} data-key="Enter">
                 <Icons.IconPrinter />
             </button>
-            <button class="stuff stuff--button" style={{width:"20%"}} aria-label={_('settings')} onClick={()=>setSettingsVisible(!settingsVisible)}>
+            <button class="stuff stuff--button" style={{width:"20%"}} aria-label={_('settings')} onClick={()=>setSettingsVisible(!settingsVisible)} data-key="\">
                 <Icons.IconSettings />
             </button>
         </div>

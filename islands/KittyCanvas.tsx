@@ -124,7 +124,7 @@ export default function KittyCanvas(props: KittyCanvasProps) {
                     action: 'add',
                     stuff: { type: 'text', id: 0 }
                 });
-            }}>
+            }} data-key=" ">
                 <Icons.IconPlus size={36} />
             </button>
         </div>

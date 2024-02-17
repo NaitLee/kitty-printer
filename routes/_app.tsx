@@ -21,6 +21,8 @@ export default async function App(req: Request, ctx: FreshContext) {
       </head>
       <body>
         <ctx.Component />
+        <div id="keyboard-shortcuts-layer"></div>
+        <script src="accessibility.js"></script>
       </body>
     </html>
   );
