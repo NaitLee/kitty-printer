@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import KittyCanvas from "../islands/KittyCanvas.tsx";
+import KittyPrinter from "../islands/KittyPrinter.tsx";
 import { _ } from "../common/i18n.tsx";
 import Nav from "../islands/Nav.tsx";
 import PwaUpdate from "../islands/PwaUpdate.tsx";
@@ -16,6 +16,6 @@ export default function Home(request: Request) {
         </Head>
 		<DynamicManifest />
         <Nav url={request.url} />
-        <KittyCanvas />
+        <KittyPrinter />
     </>;
 }

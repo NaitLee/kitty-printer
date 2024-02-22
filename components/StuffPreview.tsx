@@ -16,7 +16,7 @@ declare function splitText(args: {
 
 const image_worker = IS_BROWSER ? new Worker('/image_worker.js') : null;
 
-export default function StuffPainter(props: StuffPainterProps) {
+export default function StuffPreview(props: StuffPainterProps) {
     const [imgsrc, set_imgsrc] = useState(STUFF_PAINT_INIT_URL);
     if (!IS_BROWSER) return <img src={STUFF_PAINT_INIT_URL} width={props.width} height={1} />;
     const { canvas, width, ctx, img } = mkcanvas(props.width);

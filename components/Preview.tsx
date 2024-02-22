@@ -1,7 +1,7 @@
 import { createRef } from "preact";
 import { CAT_ADV_SRV, CAT_PRINT_RX_CHAR, CAT_PRINT_SRV, CAT_PRINT_TX_CHAR, DEF_CANVAS_WIDTH, DEF_ENERGY, DEF_FINISH_FEED, DEF_SPEED, STUFF_PAINT_INIT_URL } from "../common/constants.ts";
 import { BitmapData, PrinterProps } from "../common/types.ts";
-import StuffPainter from "./StuffPainter.tsx";
+import StuffPreview from "./StuffPreview.tsx";
 import { useMemo, useReducer } from "preact/hooks";
 import { Icons } from "../common/icons.tsx";
 import { _ } from "../common/i18n.tsx";
@@ -36,7 +36,7 @@ function rgbaToBits(data: Uint32Array) {
     return result;
 }
 
-export default function Printer(props: PrinterProps) {
+export default function Preview(props: PrinterProps) {
     const [bitmap_data, dispatch] = useReducer<Record<number, BitmapData>, BitmapData>((data, update) => {
         data[update.index] = update;
         return data;
@@ -53,7 +53,7 @@ export default function Printer(props: PrinterProps) {
     const preview = <div ref={preview_ref} class="kitty-preview">
         {stuffs.map((stuff, index) =>
             useMemo(() => 
-                <StuffPainter stuff={stuff} index={index} dispatch={dispatch} width={DEF_CANVAS_WIDTH} />
+                <StuffPreview stuff={stuff} index={index} dispatch={dispatch} width={DEF_CANVAS_WIDTH} />
             , [JSON.stringify(stuff)])
         )}
     </div>;

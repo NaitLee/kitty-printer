@@ -26,6 +26,7 @@ import IconArrowBarDown from "tabler_icons_tsx/tsx/arrow-bar-down.tsx";
 import IconPrinter from "tabler_icons_tsx/tsx/printer.tsx";
 import IconSettings from "tabler_icons_tsx/tsx/settings.tsx";
 import IconMinus from "tabler_icons_tsx/tsx/minus.tsx";
+import IconClipboardPlus from "tabler_icons_tsx/tsx/clipboard-plus.tsx";
 import { INL_ICON_COLOR, INL_ICON_SIZE } from "./constants.ts";
 
 export const Icons = {
@@ -57,6 +58,7 @@ export const Icons = {
     IconPrinter,
     IconSettings,
     IconMinus,
+    IconClipboardPlus,
 };
 
 for (const key in Icons) {

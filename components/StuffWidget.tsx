@@ -14,7 +14,7 @@ const commonsize = [
 function nextsize(size: number) { return commonsize[commonsize.indexOf(size) + 1] || commonsize.at(-1); }
 function prevsize(size: number) { return commonsize[commonsize.indexOf(size) - 1] || commonsize[0]; }
 
-export default function Stuff(props: StuffProps) {
+export default function StuffWidget(props: StuffProps) {
     const [show_options, set_show_options] = useState(false);
     const dispatch = props.dispatch;
     const stuff = props.stuff;
@@ -46,36 +46,73 @@ export default function Stuff(props: StuffProps) {
         }
     }
     const choose_pic = (event: Event) => {
-        const pic = event.currentTarget as HTMLImageElement;
-        const img = document.createElement('img');
+        // const pic = event.currentTarget as HTMLImageElement;
         const selector = document.createElement('input');
         selector.type = 'file';
         selector.addEventListener('change', () => {
             const file = selector.files![0];
             if (!file) return;
-            img.src = URL.createObjectURL(file);
-            img.addEventListener('load', () => {
-                const canvas = document.createElement('canvas');
-                const ratio = img.width / img.height;
-                // downscale but keep sufficient resolution for both rotation
-                if (ratio >= 1) {
-                    img.height = DEF_CANVAS_WIDTH;
-                    img.width = DEF_CANVAS_WIDTH * ratio;
-                } else {
-                    img.width = DEF_CANVAS_WIDTH;
-                    img.height = DEF_CANVAS_WIDTH / ratio;
-                }
-                pic.width = canvas.width = img.width;
-                pic.height = canvas.height = img.height;
-                const ctx = canvas.getContext('2d')!;
-                ctx.drawImage(img, 0, 0, img.width, img.height);
-                URL.revokeObjectURL(img.src);
-                stuff.picUrl = img.src = canvas.toDataURL();
-                // pic src updated automatically
-                dispatch({ action: 'modify', stuff: stuff });
-            }, { once: true });
+            const url = URL.createObjectURL(file);
+            use_pic(url).then(() => URL.revokeObjectURL(url));
         }, { once: true });
         selector.click();
+    }
+    const use_pic = (url: string) => new Promise<void>((resolve) => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.addEventListener('load', () => {
+            const canvas = document.createElement('canvas');
+            const ratio = img.width / img.height;
+            // downscale but keep sufficient resolution for both rotation
+            if (ratio >= 1) {
+                img.height = DEF_CANVAS_WIDTH;
+                img.width = DEF_CANVAS_WIDTH * ratio;
+            } else {
+                img.width = DEF_CANVAS_WIDTH;
+                img.height = DEF_CANVAS_WIDTH / ratio;
+            }
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d')!;
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            stuff.picUrl = img.src = canvas.toDataURL();
+            // pic src updated automatically
+            dispatch({ action: 'modify', stuff: stuff });
+            resolve();
+        }, { once: true });
+    });
+    const paste = async () => {
+        const items = await navigator.clipboard.read().catch(() => []);
+        stuff.triggerPaste = false;
+        if (items.length === 0) return;
+        const first = items[0];
+        if (first.types.includes('text/plain')) {
+            const texts = [];
+            if (!stuff.textContent)
+                stuff.textContent = '';
+            if (stuff.textContent !== '' && !stuff.textContent.endsWith('\n'))
+                stuff.textContent += '\n';
+            for (const item of items)
+                if (item.types.includes('text/plain'))
+                    texts.push(await item.getType('text/plain').then(b => b.text()));
+            if (!['text', 'qrcode'].includes(stuff.type)) {
+                stuff.type = 'text';
+            }
+            stuff.textContent += texts.join('\n');
+            dispatch({ action: 'modify', stuff: stuff });
+        } else if (first.types.includes('image/png')) {
+            const blob = await first.getType('image/png').catch(() => null);
+            if (blob === null) return;
+            if (!['pic'].includes(stuff.type)) {
+                stuff.type = 'pic';
+                stuff.dither = 'pic';
+            }
+            const url = URL.createObjectURL(blob);
+            use_pic(url).then(() => URL.revokeObjectURL(url));
+        }
+    };
+    if (stuff.triggerPaste) {
+        paste();
     }
     const change_type = (event: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
         const value = event.currentTarget.value as StuffData['type'];
@@ -271,24 +308,27 @@ export default function Stuff(props: StuffProps) {
                 }
             </div>
             <div class="stuff__menu">
-                {show_options /* && stuff.id !== 0 */ ?
+                {show_options ? <>
                     <button key="moveup" class="stuff__button" aria-label={_("move-up")}
                         onClick={() => {
                             dispatch({ action: 'moveup', stuff: stuff });
                             set_show_options(false);
                         }}>
                         <Icons.IconArrowBarUp />
-                    </button> : <></>
-                }
-                {show_options ?
+                    </button>
                     <button key="movedown" class="stuff__button" aria-label={_("move-down")}
                         onClick={() => {
                             dispatch({ action: 'movedown', stuff: stuff });
                             set_show_options(false);
                         }}>
                         <Icons.IconArrowBarDown />
-                    </button> : <></>
-                }
+                    </button>
+                </> : <>
+                    <button key="paste" class="stuff__button" aria-label={_("paste")}
+                        onClick={paste}>
+                        <Icons.IconClipboardPlus />
+                    </button>
+                </>}
                 <button key="options" class="stuff__button" aria-label={_("options")}
                     onClick={() => set_show_options(!show_options)}>
                     <Icons.IconAdjustmentsHorizontal />

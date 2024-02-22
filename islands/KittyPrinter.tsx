@@ -2,9 +2,9 @@ import { useEffect, useReducer } from "preact/hooks";
 import { DEF_PIC_URL, STUFF_STOREKEY } from "../common/constants.ts";
 import { _, i18nReady } from "../common/i18n.tsx";
 import { Icons } from "../common/icons.tsx";
-import { KittyCanvasProps, StuffData, StuffUpdate } from "../common/types.ts";
-import Printer from "../components/Printer.tsx";
-import Stuff from "../components/Stuff.tsx";
+import { KittyPrinterProps, StuffData, StuffUpdate } from "../common/types.ts";
+import Preview from "../components/Preview.tsx";
+import StuffWidget from "../components/StuffWidget.tsx";
 
 function timestamp() {
     return new Date().getTime();
@@ -45,7 +45,7 @@ function properStuff(stuff: StuffData) {
     return stuff;
 }
 
-export default function KittyCanvas(props: KittyCanvasProps) {
+export default function KittyPrinter(props: KittyPrinterProps) {
     let stuff_store: StuffData[];
     try {
         //@ts-expect-error: many would go wrong, just reset in case
@@ -108,17 +108,22 @@ export default function KittyCanvas(props: KittyCanvasProps) {
                     { type: 'text', id: 0, textContent: _('welcome').value, textAlign: 'center', textFontSize: 24 },
                     { type: 'pic', id: 1, picUrl: DEF_PIC_URL }
                 ];
-                initials.map(s => properStuff(s)).forEach(s => {
-                    dispatch({
-                        action: 'add',
-                        stuff: s
-                    });
+                initials.map(stuff => properStuff(stuff)).forEach(stuff => {
+                    dispatch({ action: 'add', stuff: stuff });
                 });
             });
     });
+    useEffect(() => {
+        document.addEventListener('paste', () => {
+            dispatch({
+                action: 'add',
+                stuff: { type: 'text', id: 0, triggerPaste: true }
+            });
+        })
+    }, []);
     const comp = <div class="kitty-container">
         <div class="kitty-canvas">
-            {stuffs.map(stuff => Stuff({ dispatch, stuff }))}
+            {stuffs.map(stuff => StuffWidget({ dispatch, stuff }))}
             <button class="stuff stuff--button" aria-label={_('add')} onClick={() => {
                 dispatch({
                     action: 'add',
@@ -129,7 +134,7 @@ export default function KittyCanvas(props: KittyCanvasProps) {
             </button>
         </div>
         <div>
-            <Printer stuffs={stuffs} />
+            <Preview stuffs={stuffs} />
         </div>
     </div>;
     return comp;

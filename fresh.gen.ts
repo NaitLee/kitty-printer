@@ -7,7 +7,7 @@ import * as $_app from "./routes/_app.tsx";
 import * as $api_lang from "./routes/api/lang.ts";
 import * as $index from "./routes/index.tsx";
 import * as $DynamicManifest from "./islands/DynamicManifest.tsx";
-import * as $KittyCanvas from "./islands/KittyCanvas.tsx";
+import * as $KittyPrinter from "./islands/KittyPrinter.tsx";
 import * as $Nav from "./islands/Nav.tsx";
 import * as $PwaUpdate from "./islands/PwaUpdate.tsx";
 import { type Manifest } from "$fresh/server.ts";
@@ -21,7 +21,7 @@ const manifest = {
   },
   islands: {
     "./islands/DynamicManifest.tsx": $DynamicManifest,
-    "./islands/KittyCanvas.tsx": $KittyCanvas,
+    "./islands/KittyPrinter.tsx": $KittyPrinter,
     "./islands/Nav.tsx": $Nav,
     "./islands/PwaUpdate.tsx": $PwaUpdate,
   },

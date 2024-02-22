@@ -4,13 +4,16 @@ import type { Icons } from "./icons.tsx";
 export type IconKey = keyof typeof Icons;
 
 export interface StuffData {
-    type: 'void' | 'text' | 'hr' | 'border' | 'pic' | 'gap';
+    type: 'void' | 'text' | 'hr' | 'border' | 'pic' | 'gap' | 'qrcode';
     id: number;
 
     /* given after painting */
     width?: number;
     /* given after painting */
     height?: number;
+
+    /* TODO: better way than such a trigger? */
+    triggerPaste?: boolean;
 
     dither?: 'pic' | 'pattern' | 'text';
     rotate?: 0 | 90 | 180 | 270;
@@ -53,7 +56,7 @@ export interface StuffUpdate {
     stuff: StuffData;
 }
 
-export interface KittyCanvasProps {}
+export interface KittyPrinterProps {}
 
 export interface StuffPainterProps {
     stuff: StuffData;
