@@ -9,3 +9,5 @@
 _fresh/
 
 *.kate-swp
+ca.crt
+ca.key
