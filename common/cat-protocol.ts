@@ -70,7 +70,6 @@ export enum Command {
     Speed = 0xbd,
     Energy = 0xaf,
     Bitmap = 0xa2,
-    _0xbc = 0xbc,
 }
 
 export enum CommandType {
@@ -141,7 +140,8 @@ export class CatPrinter {
 
     make(command: Command, payload: Uint8Array, type: CommandType = CommandType.Transfer) {
         return new Uint8Array([
-            0x51, 0x78, command, type, payload.length % 0xff, payload.length / 0xff | 0,
+            0x51, 0x78, command, type,
+            payload.length & 0xff, payload.length >> 8,
             ...payload, crc8(payload), 0xff
         ]);
     }
@@ -222,10 +222,15 @@ export class CatPrinter {
         return this.send(this.make(Command.Energy, bytes(value, 2)));
     }
 
+    prepareCamera() {
+        // try to make a camera model work
+        return this.send(new Uint8Array([0x51, 0x78, 0xbc, 0x00, 0x01, 0x02, 0x01, 0x2d, 0xff]));
+    }
+
     async prepare(speed: number, energy: number) {
         await this.flush();
         await this.getDeviceState();
-        await this.send(this.make(Command._0xbc, new Uint8Array([0x01, 0x2d, 0xff])));
+        await this.prepareCamera();
         await this.setDpi();
         await this.setSpeed(speed);
         await this.setEnergy(energy);
