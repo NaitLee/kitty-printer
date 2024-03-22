@@ -70,6 +70,7 @@ export enum Command {
     Speed = 0xbd,
     Energy = 0xaf,
     Bitmap = 0xa2,
+    _0xbc = 0xbc,
 }
 
 export enum CommandType {
@@ -224,6 +225,7 @@ export class CatPrinter {
     async prepare(speed: number, energy: number) {
         await this.flush();
         await this.getDeviceState();
+        await this.send(this.make(Command._0xbc, new Uint8Array([0x01, 0x2d, 0xff])));
         await this.setDpi();
         await this.setSpeed(speed);
         await this.setEnergy(energy);
