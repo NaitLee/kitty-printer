@@ -54,6 +54,46 @@ function bytes(i: number, length?: number, big_endian?: boolean) {
     return result;
 }
 
+function* consecutiveBits(line: Uint8Array): Generator<[number, number]> {
+    let previous: number | null = null;
+    let length = 0;
+    for (let byte of line) {
+        const single = (byte === 0xFF || byte === 0x00);
+
+        for(let i = 0; i < 8; i += 1, byte >>= 1) {
+            const bit = byte & 1;
+            if (bit !== previous) {
+                if (previous !== null)
+                    yield [previous, length];
+                previous = bit;
+                length = 0;
+            }
+            length += single ? 8 : 1;
+
+            if (single)
+                break;
+        }
+    }
+    if (previous !== null)
+        yield [previous, length];
+}
+
+function compressLine(line: Uint8Array): Uint8Array | false {
+    const result: number[] = [];
+
+    for (let [bit, length] of consecutiveBits(line)) {
+        while (length > 127) {
+            result.push(bit ? 0xff : 0x7f);
+            length -= 127
+        }
+        result.push(bit ? 0x80 | length : length);
+        if (result.length >= line.length)
+            return false;
+    }
+
+    return new Uint8Array(result);
+}
+
 function delay(msecs: number) {
     return new Promise<void>(resolve => setTimeout(() => resolve(), msecs));
 }
@@ -70,6 +110,7 @@ export enum Command {
     Speed = 0xbd,
     Energy = 0xaf,
     Bitmap = 0xa2,
+    Compress = 0xbf,
 }
 
 export enum CommandType {
@@ -105,9 +146,9 @@ export class CatPrinter {
     state: PrinterState;
 
     constructor(
-            public model: string,
-            public write: (command: Uint8Array) => Promise<void>,
-            public dry_run?: boolean) {
+        public model: string,
+        public write: (command: Uint8Array) => Promise<void>,
+        public dry_run?: boolean) {
         this.state = {
             out_of_paper: 0,
             cover: 0,
@@ -131,7 +172,7 @@ export class CatPrinter {
     }
 
     isNewModel() {
-        return this.model === 'GB03' || this.model.startsWith('MX');
+        return this.model === 'GB03' || this.model.startsWith('P7H') || this.model.startsWith('MX');
     }
 
     compressOk() {
@@ -170,7 +211,12 @@ export class CatPrinter {
     }
 
     draw(line: Uint8Array) {
-        // TODO: if (this.compressOk())
+        if (this.compressOk()) {
+            const compressed = compressLine(line);
+            if (compressed !== false) {
+                return this.send(this.make(Command.Compress, compressed));
+            }
+        }
         return this.send(this.make(Command.Bitmap, line));
     }
 
