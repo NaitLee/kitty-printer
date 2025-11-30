@@ -213,6 +213,42 @@ export default function StuffWidget(props: StuffProps) {
                     <span class="option__title">{_('stroked')}</span>
                     <input type="checkbox" onChange={mkmodifyboolean('textStroked')} checked={stuff.textStroked} />
                 </div>
+                <div className="stuff__option">
+                    <span className="option__title">{_('rotate')}</span>
+                    <button className="option__item" value="0"
+                            onClick={mkmodifynumber('rotate')} aria-label={_('rotate^none')}
+                            data-selected={stuff.rotate === 0}>
+                        <span className="stuff__label">{_('rotate^none')}</span>
+                    </button>
+                    <button className="option__item" value="90"
+                            onClick={mkmodifynumber('rotate')} aria-label={_('90-degree')}
+                            data-selected={stuff.rotate === 90}>
+                        <Icons.IconRotateClockwise2/>
+                    </button>
+                    <button className="option__item" value="180"
+                            onClick={mkmodifynumber('rotate')} aria-label={_('180-degree')}
+                            data-selected={stuff.rotate === 180}>
+                        <Icons.IconRotateClockwise/>
+                    </button>
+                    <button className="option__item" value="270"
+                            onClick={mkmodifynumber('rotate')} aria-label={_('270-degree')}
+                            data-selected={stuff.rotate === 270}>
+                        <Icons.IconRotate2/>
+                    </button>
+                </div>
+                <div className="stuff__option">
+                    <span className="option__title">{_('flip')}</span>
+                    <label className="option__item">
+                        <input type="checkbox" onChange={mkmodifyboolean('flipH')}
+                               checked={stuff.flipH} aria-label={_('flip^horizontal')}/>
+                        <Icons.IconFlipVertical/>
+                    </label>
+                    <label className="option__item">
+                        <input type="checkbox" onChange={mkmodifyboolean('flipV')}
+                               checked={stuff.flipV} aria-label={_('flip^vertical')}/>
+                        <Icons.IconFlipHorizontal/>
+                    </label>
+                </div>
             </>;
             break;
         case 'pic':

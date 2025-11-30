@@ -22,42 +22,92 @@ export default function StuffPreview(props: StuffPainterProps) {
     const { canvas, width, ctx, img } = mkcanvas(props.width);
     const stuff = props.stuff;
     let font;
-    // let imagedata: ImageData;
     let strings: string[];
     let measured: TextMetrics[];
     let line_height;
     let msg: ImageWorkerMessage;
     let imagedata: ImageData;
-    let anchor_x: number, anchor_y: number;
     (async function() {
         switch (stuff.type) {
             case 'text':
                 ctx.fillStyle = 'black';
                 ctx.strokeStyle = 'black';
-                ctx.textAlign = stuff.textAlign === 'justify' ? 'start' : stuff.textAlign!;
                 font = `${stuff.textFontWeight} ${stuff.textFontSize}px "${stuff.textFontFamily}"`;
                 // ctx.font is set multiple times intensionally
                 ctx.font = font;
+                const is_rotated_sideways = stuff.rotate === 90 || stuff.rotate === 270;
                 strings = splitText({
                     ctx: ctx,
                     text: stuff.textContent!,
                     justify: stuff.textAlign === 'justify',
-                    width: width
+                    width: is_rotated_sideways ? 10000 : width
                 });
                 ctx.font = font;
                 measured = strings.map(s => ctx.measureText(s));
                 line_height = stuff.textLineSpacing! + Math.max(...measured.map(m => m.actualBoundingBoxAscent), stuff.textFontSize!);
-                canvas.height = line_height * strings.length + stuff.textLineSpacing!;
+                
+                const text_intrinsic_height = line_height * strings.length + stuff.textLineSpacing!;
+
+                const needs_flip = is_rotated_sideways
+                    ? (stuff.rotate === 90) !== !!stuff.flipV
+                    : (stuff.rotate === 180) !== !!stuff.flipH;
+
+                let effectiveTextAlign = stuff.textAlign;
+                if (needs_flip) {
+                    if (stuff.textAlign === 'start') effectiveTextAlign = 'end';
+                    else if (stuff.textAlign === 'end') effectiveTextAlign = 'start';
+                }
+                const shiftMultiplier = needs_flip ? -1 : 1;
+
+                let y_offset = 0;
+
+                if (is_rotated_sideways) {
+                    const text_intrinsic_width = Math.max(...measured.map(m => m.width));
+                    canvas.width = text_intrinsic_width > 0 ? text_intrinsic_width : 1;
+                    canvas.height = width; // Use preview width for the height, which will be rotated to become the new width.
+
+                    let h_align_offset = 0;
+                    switch (effectiveTextAlign) {
+                        case 'center':
+                            h_align_offset = (canvas.height - text_intrinsic_height) / 2;
+                            break;
+                        case 'end':
+                            h_align_offset = canvas.height - text_intrinsic_height;
+                            break;
+                    }
+                    const h_shift_offset = shiftMultiplier * stuff.textShift! * canvas.height;
+                    y_offset = h_align_offset + h_shift_offset;
+                } else {
+                    canvas.height = text_intrinsic_height > 0 ? text_intrinsic_height : 1;
+                }
+
                 ctx.font = font;
+                ctx.fillStyle = 'black';
+                ctx.strokeStyle = 'black';
+                ctx.textAlign = 'start';
                 for (let i = 0; i < strings.length; ++i) {
                     const s = strings[i];
-                    anchor_x = ({
-                        'start': 0,
-                        'center': (width / 2 - measured[i].width / 2) | 0,
-                        'end': (width - measured[i].width) | 0,
-                        'justify': 0
-                    })[stuff.textAlign!] + (stuff.textShift! * width);
-                    anchor_y = line_height * (i + 1);
+                    let anchor_x;
+
+                    if (is_rotated_sideways) {
+                        const text_block_width = canvas.width;
+                        anchor_x = ({
+                            'start': 0,
+                            'center': (text_block_width - measured[i].width) / 2,
+                            'end': text_block_width - measured[i].width,
+                            'justify': 0
+                        })[stuff.textAlign!];
+                    } else {
+                        anchor_x = ({
+                            'start': 0,
+                            'center': (width - measured[i].width) / 2,
+                            'end': width - measured[i].width,
+                            'justify': 0
+                        })[effectiveTextAlign] + (shiftMultiplier * stuff.textShift! * width);
+                    }
+                    
+                    const anchor_y = y_offset + line_height * (i + 1);
+
                     if (stuff.textStroked) {
                         ctx.strokeText(s, anchor_x, anchor_y);
                     } else {
