@@ -62,6 +62,7 @@ export enum Command {
     ApplyEnergy = 0xbe,
     GetDeviceState = 0xa3,
     GetDeviceInfo = 0xa8,
+    GetDeviceId = 0xbb,
     UpdateDevice = 0xa9,
     SetDpi = 0xa4,
     Lattice = 0xa6,
@@ -96,18 +97,16 @@ export enum StateFlag {
 }
 
 export class CatPrinter {
-
-    pause = new Uint8Array([0x51, 0x78, 0xa3, 0x01, 0x01, 0x00, 0x10, 0x70, 0xff]);
-    resume = new Uint8Array([0x51, 0x78, 0xa3, 0x01, 0x01, 0x00, 0x00, 0x00, 0xff]);
     mtu = 200;
     buffer = new Uint8Array(this.mtu);
     bufferSize = 0;
     state: PrinterState;
+    deviceVersion = "";
 
     constructor(
-            public model: string,
-            public write: (command: Uint8Array) => Promise<void>,
-            public dry_run?: boolean) {
+        public model: string,
+        public write: (command: Uint8Array) => Promise<void>,
+        public dry_run?: boolean) {
         this.state = {
             out_of_paper: 0,
             cover: 0,
@@ -119,18 +118,72 @@ export class CatPrinter {
     }
 
     notify = (message: Uint8Array) => {
-        const state = message[6];
-        this.state = {
-            out_of_paper: state & StateFlag.out_of_paper,
-            cover: state & StateFlag.cover,
-            overheat: state & StateFlag.overheat,
-            low_power: state & StateFlag.low_power,
-            pause: state & StateFlag.pause,
-            busy: state & StateFlag.busy
-        };
+        if (message.length < 9 || message[0] !== 0x51 || message[1] !== 0x78 || message[3] !== CommandType.Response) {
+            console.error("Invalid message received", message);
+            return;
+        }
+        const command = message[2];
+        const payloadLength = message[4] | message[5] << 8;
+        if (message.length < 6 + payloadLength + 2) {
+            console.error("Invalid payload length", message);
+            return;
+        }
+        const crc = message[6 + payloadLength];
+        if (crc !== crc8(message.slice(6, 6 + payloadLength))) {
+            console.error("Invalid crc in received message", message);
+            return;
+        }
+
+        if (message.length > 6 + payloadLength + 2) {
+            console.log("Extra data after received message", message.slice(6 + payloadLength + 2));
+        }
+
+        if (command === Command.GetDeviceState) {
+            const state = message[6];
+            this.state = {
+                out_of_paper: state & StateFlag.out_of_paper,
+                cover: state & StateFlag.cover,
+                overheat: state & StateFlag.overheat,
+                low_power: state & StateFlag.low_power,
+                pause: state & StateFlag.pause,
+                busy: state & StateFlag.busy,
+            };
+            if (state !== 0)
+                console.log(`State (failure): ${JSON.stringify(this.state)}`);
+
+            if (payloadLength >= 3) {
+                let battery = message[8] - 35;
+                battery = battery < 0 ? 0 : battery > 6 ? 6 : battery;
+
+                console.log(`Battery: ${battery}`);
+                console.debug(`Label detection??: ${message[7]}`);
+            }
+        } else if (command === Command.GetDeviceInfo) {
+            if (payloadLength < 10) {
+                console.error("Payload length for a device info is too short", message);
+            }
+            const deviceType = "XW00" + message[6];
+            const deviceVersion = String.fromCharCode(...message.slice(9, 9 + 7 - 1)); // null at the end
+            console.log(`Device type: ${deviceType} Version: ${deviceVersion}`);
+            // following are unknown on bt-only devices, dummy values?
+            console.debug(`WifiState??: ${message[8]} WifiConnected??: ${message[7]}`);
+        } else if (command === Command.GetDeviceId) {
+            const devId = message.slice(6, 6 + 6).reduce((s, x) => s + x.toString(16).padStart(2, "0"), "");
+            console.log(`Device id: ${devId}`);
+        } else if (command === 0xae) { // line control
+            if (message[6] === 0x10)
+                console.warn("Received pause request");
+        } else {
+            console.error("Unknown message received", message);
+            return;
+        }
     }
 
     isNewModel() {
+        if (this.deviceVersion.includes('.')) {
+            const [major, minor] = this.deviceVersion.split('.').map(x => ~~x);
+            return (major >= 1 || (major == 1 && minor >= 1));
+        }
         return this.model === 'GB03' || this.model.startsWith('MX');
     }
 
@@ -190,6 +243,10 @@ export class CatPrinter {
         return this.send(this.make(Command.GetDeviceInfo, bytes(0x00)));
     }
 
+    getDeviceId() {
+        return this.send(this.make(Command.GetDeviceId, bytes(0x01)));
+    }
+
     updateDevice() {
         return this.send(this.make(Command.UpdateDevice, bytes(0x00)));
     }
@@ -228,8 +285,10 @@ export class CatPrinter {
     }
 
     async prepare(speed: number, energy: number) {
-        await this.flush();
         await this.getDeviceState();
+        await this.getDeviceInfo();
+        await this.getDeviceId();
+        await this.flush();
         await this.prepareCamera();
         await this.setDpi();
         await this.setSpeed(speed);
